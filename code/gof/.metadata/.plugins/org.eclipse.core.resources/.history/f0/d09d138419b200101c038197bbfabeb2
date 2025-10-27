@@ -1,0 +1,6 @@
+package com.bankapp.dto;
+public class Account {
+    private int id;
+    private String name;
+    private BigDecimal balance;
+}

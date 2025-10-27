@@ -1,0 +1,633 @@
+
+
+Fund transfer application : applying design pattern:
+---------------------------------------------------
+
+CREATIONAL PATTERNS — “How objects are created”
+--------------------------------------
+Singleton: default bean scope
+Prototype:  bean per call
+Factory Method: spring bean factory
+Abstract Factory: 
+Builder:
+
+Singleton Pattern — One instance shared globally
+----------------------------------------------
+Use Case: Centralized transaction logger.
+
+public class TransactionLogger {
+
+    private static TransactionLogger instance;
+
+    private TransactionLogger() {}
+
+    public static synchronized TransactionLogger getInstance() {
+        if (instance == null) {
+            instance = new TransactionLogger();
+        }
+        return instance;
+    }
+
+    public void log(String message) {
+        System.out.println("[LOG] " + message);
+    }
+}
+
+with spring boot :
+------------
+@Service
+public class TransactionLogger {
+
+    public void log(String message) {
+        System.out.println("[LOG] " + message);
+    }
+}
+
+What Happens Internally
+-------------------------
+	Spring creates exactly one instance of this bean at startup.
+	The bean is cached inside the ApplicationContext.
+	Whenever it’s @Autowired anywhere, Spring injects the same instance.
+
+
+
+Implementing prototype pattern with spring boot:
+------------------------------------------------------
+@Component
+@Scope("prototype")  // each request gives a new instance
+public class TransactionPrototype {
+    private String transactionId;
+
+    public TransactionPrototype() {
+        this.transactionId = "TXN-" + System.currentTimeMillis();
+        System.out.println("Creating new TransactionPrototype: " + transactionId);
+    }
+
+    public String getTransactionId() {
+        return transactionId;
+    }
+}
+
+and how to use it?
+------------------
+@Service
+public abstract class FundTransferService {
+
+    public void transfer(double amount) {
+        TransactionPrototype txn = createTransaction(); // 💥 new prototype each time
+        System.out.println("Processing " + txn.getId());
+    }
+
+    @Lookup
+    protected abstract TransactionPrototype createTransaction();
+}
+
+
+Bean					Scope					Purpose
+TransactionLogger		@Service (Singleton)	Shared logger instance
+TransactionPrototype	@Scope("prototype")		Fresh transaction object per transfer
+FundTransferService		@Service (Singleton)	Business logic, injects prototype 
+												dynamically via ObjectFactory, Provider, or @Lookup
+
+Builder Pattern Using Lombok (Modern, Simple)
+
+
+
+
+
+
+Abstract Factory looks like this
+--------------------------------
+
+Step 1: Define abstract products
+-----------------------------------
+public interface BankAccount {
+    void accountType();
+}
+
+public interface TransactionProcessor {
+    void processTransaction(double amount);
+}
+
+Step 2: Concrete implementations (same)
+-----------------------------------
+@Component
+@Profile("retail")
+class RetailAccount implements BankAccount {}
+
+@Component
+@Profile("corporate")
+class CorporateAccount implements BankAccount {}
+
+
+Step 3: Define a factory interface
+-----------------------------------
+public interface BankingFactory {
+    BankAccount createAccount();
+    TransactionProcessor createTransactionProcessor();
+}
+
+Step 4: Implement concrete factories as Spring Beans
+-----------------------------------
+@Component
+@Profile("retail")
+class RetailBankingFactory implements BankingFactory {
+
+    @Override
+    public BankAccount createAccount() {
+        return new RetailAccount();
+    }
+
+    @Override
+    public TransactionProcessor createTransactionProcessor() {
+        return new RetailTransactionProcessor();
+    }
+}
+
+@Component
+@Profile("retail")
+public class RetailTransactionProcessor implements TransactionProcessor {
+
+    @Override
+    public void processTransaction(double amount) {
+        System.out.println("Processing Retail transaction of ₹" + amount);
+        // Retail-specific rules, fees, notifications, etc.
+    }
+}
+
+@Component
+@Profile("corporate")
+public class CorporateTransactionProcessor implements TransactionProcessor {
+
+    @Override
+    public void processTransaction(double amount) {
+        System.out.println("Processing Corporate transaction of ₹" + amount);
+        // Corporate-specific logic, approvals, batch transfers, etc.
+    }
+}
+
+@Component
+@Profile("corporate")
+class CorporateBankingFactory implements BankingFactory {
+
+    @Override
+    public Account createAccount() {
+        return new CorporateAccount();
+    }
+
+    @Override
+    public TransactionProcessor createTransactionProcessor() {
+        return new CorporateTransactionProcessor();
+    }
+}
+
+Step 5: Use it in your service via Spring DI
+-----------------------------------
+
+@Service
+public class FundTransferService {
+
+    private final BankingFactory factory;
+
+    @Autowired
+    public FundTransferService(BankingFactory factory) {
+        this.factory = factory;
+    }
+
+    public void execute(double amount) {
+        factory.createTransactionProcessor().processTransaction(amount);
+    }
+}
+
+Step 6: Control behavior via Spring Profiles
+-----------------------------------------------
+
+Now, when you run:
+spring.profiles.active=retail
+
+Spring injects the RetailBankingFactory
+
+When you run:
+spring.profiles.active=corporate
+
+
+
+
+
+
+
+
+
+
+
+➡️ Spring injects the CorporateBankingFactory
+✅ Usage:
+
+TransactionLogger.getInstance().log("Transfer of ₹5000 from 1→2 completed");
+
+2️⃣ Factory Method Pattern — Subclasses decide which object to create
+
+Use Case: Create different types of accounts dynamically.
+
+public abstract class AccountFactory {
+    public abstract Account createAccount(int id, String name, BigDecimal balance);
+
+    public static AccountFactory getFactory(String type) {
+        if (type.equalsIgnoreCase("SAVINGS")) return new SavingsAccountFactory();
+        else return new CurrentAccountFactory();
+    }
+}
+
+class SavingsAccountFactory extends AccountFactory {
+    public Account createAccount(int id, String name, BigDecimal balance) {
+        return new SavingsAccount(id, name, balance);
+    }
+}
+
+class CurrentAccountFactory extends AccountFactory {
+    public Account createAccount(int id, String name, BigDecimal balance) {
+        return new CurrentAccount(id, name, balance);
+    }
+}
+
+// Product types
+class SavingsAccount extends Account {
+    public SavingsAccount(int id, String name, BigDecimal balance) {
+        super(id, name, balance);
+    }
+}
+
+class CurrentAccount extends Account {
+    public CurrentAccount(int id, String name, BigDecimal balance) {
+        super(id, name, balance);
+    }
+}
+
+
+✅ Usage:
+
+AccountFactory factory = AccountFactory.getFactory("SAVINGS");
+Account acc = factory.createAccount(10, "Gunika", new BigDecimal("5000"));
+
+3️⃣ Abstract Factory Pattern — Factory of factories
+
+Use Case: Create account families for different banks (HDFC, SBI, etc.)
+
+interface BankFactory {
+    Account createAccount();
+    Loan createLoan();
+}
+
+class HDFCBankFactory implements BankFactory {
+    public Account createAccount() { return new SavingsAccount(101, "Ekta", new BigDecimal("8000")); }
+    public Loan createLoan() { return new HomeLoan(); }
+}
+
+class SBIBankFactory implements BankFactory {
+    public Account createAccount() { return new CurrentAccount(201, "Rajeev", new BigDecimal("12000")); }
+    public Loan createLoan() { return new BusinessLoan(); }
+}
+
+interface Loan {}
+class HomeLoan implements Loan {}
+class BusinessLoan implements Loan {}
+
+
+✅ Usage:
+
+BankFactory bankFactory = new HDFCBankFactory();
+Account acc = bankFactory.createAccount();
+Loan loan = bankFactory.createLoan();
+
+4️⃣ Builder Pattern — Step-by-step object construction
+
+Use Case: Build complex transaction objects.
+
+public class Transaction {
+    private int fromId;
+    private int toId;
+    private BigDecimal amount;
+    private String type;
+
+    private Transaction() {}
+
+    public static class Builder {
+        private int fromId;
+        private int toId;
+        private BigDecimal amount;
+        private String type;
+
+        public Builder from(int id) { this.fromId = id; return this; }
+        public Builder to(int id) { this.toId = id; return this; }
+        public Builder amount(BigDecimal amt) { this.amount = amt; return this; }
+        public Builder type(String type) { this.type = type; return this; }
+
+        public Transaction build() {
+            Transaction tx = new Transaction();
+            tx.fromId = fromId; tx.toId = toId; tx.amount = amount; tx.type = type;
+            return tx;
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "Txn[from=" + fromId + ", to=" + toId + ", amt=" + amount + ", type=" + type + "]";
+    }
+}
+
+
+✅ Usage:
+
+Transaction tx = new Transaction.Builder()
+        .from(1).to(2).amount(new BigDecimal("5000")).type("NEFT").build();
+System.out.println(tx);
+
+5️⃣ Prototype Pattern — Clone existing objects
+
+Use Case: Create duplicate accounts from a base template.
+
+public class AccountPrototype implements Cloneable {
+    private int id;
+    private String name;
+    private BigDecimal balance;
+
+    public AccountPrototype(int id, String name, BigDecimal balance) {
+        this.id = id; this.name = name; this.balance = balance;
+    }
+
+    public AccountPrototype clone() {
+        try {
+            return (AccountPrototype) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+}
+
+
+✅ Usage:
+
+AccountPrototype vipTemplate = new AccountPrototype(100, "VIP", new BigDecimal("100000"));
+AccountPrototype cloned = vipTemplate.clone();
+
+🏗️ STRUCTURAL PATTERNS — “How classes and objects are composed”
+6️⃣ Adapter Pattern — Convert one interface to another
+
+Use Case: Adapt external RBIAccount to internal Account.
+
+class RBIAccount {
+    int accNo; String holder; double bal;
+    // getters...
+}
+
+class RbiAccountAdapter extends Account {
+    public RbiAccountAdapter(RBIAccount ext) {
+        super(ext.accNo, ext.holder, BigDecimal.valueOf(ext.bal));
+    }
+}
+
+
+✅ Usage:
+
+RBIAccount ext = new RBIAccount();
+Account acc = new RbiAccountAdapter(ext);
+
+7️⃣ Decorator Pattern — Add new behavior dynamically
+
+Use Case: Add logging & notification on AccountService.
+
+public class LoggingAccountService implements AccountService {
+    private final AccountService delegate;
+    public LoggingAccountService(AccountService delegate) { this.delegate = delegate; }
+
+    public void transfer(int from, int to, BigDecimal amt) {
+        System.out.println("Logging before transfer...");
+        delegate.transfer(from, to, amt);
+        System.out.println("Logging after transfer...");
+    }
+
+    // delegate other methods...
+}
+
+
+✅ Usage:
+
+AccountService service = new LoggingAccountService(new AccountServiceImpl());
+service.transfer(1, 2, new BigDecimal("500"));
+
+8️⃣ Facade Pattern — Simplify complex subsystem
+
+Use Case: Simplify full fund transfer flow.
+
+@Service
+public class FundTransferFacade {
+    @Autowired private AccountService service;
+    @Autowired private FraudCheckService fraudService;
+    @Autowired private NotificationService notifyService;
+
+    public void transfer(int from, int to, BigDecimal amount) {
+        fraudService.validate(from, to, amount);
+        service.transfer(from, to, amount);
+        notifyService.notifyTransfer(from, to, amount);
+    }
+}
+
+9️⃣ Proxy Pattern — Control access to another object
+
+Use Case: Add security or caching before DAO access.
+
+public class SecureAccountProxy implements AccountDao {
+    private final AccountDao target;
+
+    public SecureAccountProxy(AccountDao target) { this.target = target; }
+
+    public Account getById(int id) {
+        if (!SecurityContext.isAuthorized()) throw new RuntimeException("Unauthorized");
+        return target.getById(id);
+    }
+    // other methods delegate...
+}
+
+🔟 Composite Pattern — Tree structure representation
+
+Use Case: Combine multiple accounts into one “FamilyAccount”.
+
+interface AccountComponent {
+    BigDecimal getBalance();
+}
+
+class SingleAccount implements AccountComponent {
+    private BigDecimal balance;
+    public SingleAccount(BigDecimal balance) { this.balance = balance; }
+    public BigDecimal getBalance() { return balance; }
+}
+
+class FamilyAccount implements AccountComponent {
+    private List<AccountComponent> members = new ArrayList<>();
+    public void add(AccountComponent acc) { members.add(acc); }
+    public BigDecimal getBalance() {
+        return members.stream().map(AccountComponent::getBalance)
+                      .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+}
+
+
+✅ Usage:
+
+FamilyAccount family = new FamilyAccount();
+family.add(new SingleAccount(new BigDecimal("5000")));
+family.add(new SingleAccount(new BigDecimal("7000")));
+System.out.println(family.getBalance()); // 12000
+
+1️⃣1️⃣ Flyweight Pattern — Share immutable objects
+
+Use Case: Share account type metadata.
+
+class AccountType {
+    private String type; private double interestRate;
+    public AccountType(String type, double rate) { this.type = type; this.interestRate = rate; }
+}
+
+class AccountTypeFactory {
+    private static final Map<String, AccountType> cache = new HashMap<>();
+    public static AccountType getType(String type) {
+        return cache.computeIfAbsent(type, t -> new AccountType(t, 4.5));
+    }
+}
+
+
+✅ Usage:
+
+AccountType t1 = AccountTypeFactory.getType("SAVINGS");
+AccountType t2 = AccountTypeFactory.getType("SAVINGS");
+System.out.println(t1 == t2); // true
+
+⚙️ BEHAVIORAL PATTERNS — “How objects interact”
+1️⃣2️⃣ Strategy Pattern — Different transfer algorithms
+interface TransferStrategy {
+    void transfer(Account from, Account to, BigDecimal amt);
+}
+
+class NeftTransfer implements TransferStrategy {
+    public void transfer(Account from, Account to, BigDecimal amt) {
+        System.out.println("Processing NEFT...");
+    }
+}
+
+class ImpsTransfer implements TransferStrategy {
+    public void transfer(Account from, Account to, BigDecimal amt) {
+        System.out.println("Processing IMPS...");
+    }
+}
+
+class TransferContext {
+    private TransferStrategy strategy;
+    public void setStrategy(TransferStrategy s) { this.strategy = s; }
+    public void execute(Account f, Account t, BigDecimal a) { strategy.transfer(f, t, a); }
+}
+
+1️⃣3️⃣ Observer Pattern — Notify multiple channels
+interface Observer { void update(String msg); }
+
+class SmsObserver implements Observer { public void update(String msg) { System.out.println("SMS: " + msg); } }
+class EmailObserver implements Observer { public void update(String msg) { System.out.println("Email: " + msg); } }
+
+class TransactionNotifier {
+    private List<Observer> observers = new ArrayList<>();
+    public void addObserver(Observer o) { observers.add(o); }
+    public void notifyAll(String msg) { observers.forEach(o -> o.update(msg)); }
+}
+
+1️⃣4️⃣ Chain of Responsibility — Sequential validation
+abstract class ValidationHandler {
+    protected ValidationHandler next;
+    public ValidationHandler setNext(ValidationHandler n) { this.next = n; return n; }
+    public abstract void validate(Account f, Account t, BigDecimal amt);
+}
+
+class BalanceCheckHandler extends ValidationHandler {
+    public void validate(Account f, Account t, BigDecimal amt) {
+        if (f.getBalance().compareTo(amt) < 0) throw new RuntimeException("Insufficient balance");
+        if (next != null) next.validate(f, t, amt);
+    }
+}
+
+1️⃣5️⃣ Command Pattern — Encapsulate actions
+interface Command { void execute(); }
+
+class TransferCommand implements Command {
+    private AccountService service;
+    private int from, to;
+    private BigDecimal amt;
+    public TransferCommand(AccountService s, int f, int t, BigDecimal a) {
+        this.service = s; this.from = f; this.to = t; this.amt = a;
+    }
+    public void execute() { service.transfer(from, to, amt); }
+}
+
+1️⃣6️⃣ State Pattern — Account behavior changes with state
+interface AccountState { void withdraw(Account acc, BigDecimal amt); }
+
+class ActiveState implements AccountState {
+    public void withdraw(Account acc, BigDecimal amt) {
+        System.out.println("Withdraw allowed.");
+    }
+}
+
+class BlockedState implements AccountState {
+    public void withdraw(Account acc, BigDecimal amt) {
+        System.out.println("Withdraw denied. Account blocked!");
+    }
+}
+
+1️⃣7️⃣ Template Method Pattern — Define algorithm skeleton
+abstract class FundTransferTemplate {
+    public final void execute() {
+        validate();
+        debit();
+        credit();
+        notifyParties();
+    }
+    abstract void validate();
+    abstract void debit();
+    abstract void credit();
+    void notifyParties() { System.out.println("Notifying both accounts..."); }
+}
+
+1️⃣8️⃣ Mediator Pattern — Centralized communication
+class BankingMediator {
+    private FraudService fraud;
+    private NotificationService notify;
+    private AuditService audit;
+
+    public void register(FraudService f, NotificationService n, AuditService a) {
+        this.fraud = f; this.notify = n; this.audit = a;
+    }
+
+    public void transferEvent(String msg) {
+        fraud.scan(msg);
+        notify.send(msg);
+        audit.record(msg);
+    }
+}
+
+1️⃣9️⃣ Memento Pattern — Save/restore previous state
+class AccountMemento {
+    private BigDecimal balance;
+    public AccountMemento(BigDecimal bal) { this.balance = bal; }
+    public BigDecimal getSavedBalance() { return balance; }
+}
+
+class AccountOriginator {
+    private BigDecimal balance;
+    public void setBalance(BigDecimal b) { this.balance = b; }
+    public AccountMemento save() { return new AccountMemento(balance); }
+    public void restore(AccountMemento m) { this.balance = m.getSavedBalance(); }
+}
+
+
+✅ Remaining Patterns (for completeness)
+20. Interpreter – parse rules (like “MIN_BAL>1000”)
+21. Iterator – loop through accounts (accounts.values().iterator())
+22. Visitor – perform operations on multiple account types
+23. Null Object – NullAccount instead of returning null

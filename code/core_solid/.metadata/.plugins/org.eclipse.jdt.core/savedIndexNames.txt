@@ -1,0 +1,5 @@
+INDEX VERSION 1.134+C:\design_pattern_workshop_27_30_oct25\code\core_solid\.metadata\.plugins\org.eclipse.jdt.core
+1865797976.index
+3139752775.index
+2828293006.index
+4248627183.index
