@@ -1,6 +1,9 @@
 package com.solid.pattern.lsp1;
 
 //Rectangle "reuse" Square : Inheritance XXX
+
+//Effective java- pdf
+
 class Rectangle {
 	private int l, b;
 
@@ -31,7 +34,6 @@ class Rectangle {
 
 }
 //Why not to inherit rectangle in order to resue the logic
-
 //class Square extends Rectangle {
 //
 //	public Square(int l) {

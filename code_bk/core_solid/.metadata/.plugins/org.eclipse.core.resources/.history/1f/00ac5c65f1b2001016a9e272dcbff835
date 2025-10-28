@@ -1,0 +1,61 @@
+package com.oops.ex0;
+
+//
+/*
+ * "A passanger named raj is using metro to travel from BTM to Banargatta"
+ * 
+ * what is abstraction?
+	design principle of seprating interface from implementation 
+	so that client only concern with interface
+	
+	iplementated by interface / abs class
+	we just need to press ac remote 
+ */
+//3 ways : use a , has a(Compostion and agg) , is a (inheritance)
+//favour Compostion over inheritance*
+
+//abstract class Vehicle{
+//	public abstract void move(String s, String d) ;
+//}
+//"abstract class and interface are two ways to achive abs in java"
+interface  Vehicle{
+	public abstract void move(String s, String d) ;
+}
+class Car implements Vehicle{
+	public void move(String s, String d) {
+		System.out.println("passanger is moving from "+ s + " to "+ d +" using car");
+	}
+}
+
+class Metro implements Vehicle{
+	public void move(String s, String d) {
+		System.out.println("passanger is moving from "+ s + " to "+ d +" using metro");
+	}
+}
+class Bike extends Vehicle{
+	public void move(String s, String d) {
+		System.out.println("passanger is moving from "+ s + " to "+ d +" using bike");
+	}
+}
+class Passanger {
+	private String name;
+
+	public Passanger(String name) {
+		this.name = name;
+	}
+	
+	public void travel(String s, String d, Vehicle vehicle) {
+		System.out.println("passnger named : "+ name);
+		vehicle.move(s, d);
+	}
+	
+}
+public class DemoLoseCoupling {
+
+	public static void main(String[] args) {
+		Vehicle  bike=new Car();
+		Passanger passanger=new Passanger("raj");
+		passanger.travel("BTM", "Banargatta", bike);
+		
+	}
+}

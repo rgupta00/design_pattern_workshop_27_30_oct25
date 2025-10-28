@@ -1,3 +1,6 @@
+https://www.linkedin.com/in/rajeevguptajavatrainer/
+https://github.com/rgupta00/design_pattern_workshop_27_30_oct25
+
 
 Deep Dive design pattern with java
 -----------------------------------
@@ -238,6 +241,179 @@ public class Demo {
 }
 
 
+//3 ways : use a , has a(Compostion and agg) , is a (inheritance)
+
+Passanger Metro
+
+
+class Passanger {
+	
+	public void travel(String s, String d,Vehicle v) {
+		//....
+	}
+	
+}
+
+class Passanger {
+
+	private Metro metro;
+	
+	public void travel(String s, String d) {
+		//....
+	}
+	
+}
+
+class Passanger {
+
+	private Vehicle vehicle;
+	
+	public void travel(String s, String d) {
+		//....
+	}
+	
+}
+
+
+package com.demo;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.Properties;
+
+//GOD class--- 
+class Product {
+	private int id;
+	private String name;
+	private double price;
+
+	public boolean valiation() {
+		// logic of valiation in this class
+		return true;
+	}
+
+	public Product(String name, double price) {
+		super();
+		this.name = name;
+		this.price = price;
+	}
+
+	public Connection getConnection() {
+		Connection connection = null;
+		Properties prop = new Properties();// aka hashtable,,used to load prop file
+		InputStream is;
+		try {
+			is = Product.class.getClassLoader().getResourceAsStream("db.properties");
+
+			prop.load(is);// this will get key and values
+
+		} catch (IOException e1) {
+
+			e1.printStackTrace();
+		}
+
+		String driverName = prop.getProperty("jdbc.driver");
+		System.out.println(driverName);
+		String url = prop.getProperty("jdbc.url");
+		String username = prop.getProperty("jdbc.username");
+		String password = prop.getProperty("jdbc.password");
+
+		try {
+			Class.forName(driverName);// this is dynamic class loading
+			System.out.println("driver is loaded");
+		} catch (ClassNotFoundException ex) {
+			System.out.println(ex);
+			System.out.println("driver loading is not working");
+		}
+
+		try {
+			connection = DriverManager.getConnection(url, username, password);
+			System.out.println("-------------");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return connection;
+	}
+
+	public void addProduct() {
+		try {
+			Connection connection = getConnection();
+			PreparedStatement pstmt = connection.prepareStatement("insert into product(name,price) values(?,?)");
+			pstmt.setString(1, name);
+			pstmt.setDouble(2, price);
+
+			pstmt.executeUpdate();
+		} catch (SQLException ex) {
+			ex.printStackTrace();
+		}
+
+	}
+
+}
+
+
+Collection api:
+java 1.4 we dont have Queue
+how to impl Queue re-using LL class
+
+
+
+3 tier arch: MVC
+
+controller ---------- service --------- repo / dao ----------- db 
+
+
+class A extends Object{
+
+
+}
+
+interface  Tyre{
+	public void rotate();
+}
+
+class MrfTyre impl... Tyre{
+	public void rotate(){
+		sysout("mrf tyre");
+	}
+}
+
+class CeatTyre impl... Tyre{
+	public void rotate(){
+		sysout("mrf tyre");
+	}
+}
+
+class Car{
+	private Tyre tyre;
+	
+	public Car(Tyre tyre){
+		this.tyre=tyre;
+	}
+	public void move(){
+	
+		tyre.rotate();
+	}
+
+}
+
+DI is akf IOC
+
+class Passanger extends Metro{
+
+	
+	
+}
+
+
+//favour Compostion over inheritance*
+
+
 favour composition over inheritance
 -----------------------------------
 	=> square rectangle liskov java
@@ -445,7 +621,7 @@ Creational Pattern
 -------------------
 Creational Design Patterns
 	Creational patterns deal with object creation — how and when objects are created.
-	 What is the best way to create object?
+	What is the best way to create object?
 	 
 Why called “Creational”?
 		Because they focus on the creation process — hiding complex construction 
@@ -526,6 +702,8 @@ Behavioral Design Patterns
 	Memento 		→ undo/save state
 	Template Method	 → skeleton algorithm with steps to override
 
+
+java reflection and annotation programing?
 
 
 
@@ -659,7 +837,8 @@ Creational Pattern
  need of volatile keyword
  --------------------------
 
-	In the given SingletonObject implementation, should the singletonObject variable be declared as volatile?
+	In the given SingletonObject implementation, should the singletonObject 
+	variable be declared as volatile?
 
 	The statement:
 	instance = new Singleton();
@@ -1324,7 +1503,7 @@ Issues:
 
 
 2. Factory Method Pattern (GoF Design Pattern)
-------------------------------------------------
+----------------------------------------------
     • Define a factory interface.
     • Subclasses override the factory method to create objects.
 
@@ -1696,11 +1875,11 @@ Cross-Cutting Concerns?
 	— not part of business logic but required everywhere.
 
 	Examples:
-	Logging
-	Security checks
-	Transaction management
-	Performance monitoring
-	Caching
+		Logging
+		Security checks
+		Transaction management
+		Performance monitoring
+		Caching
 
 	Instead of duplicating this code across multiple classes, 
 	we centralize it via AOP, which internally uses Proxy Pattern.
@@ -1848,7 +2027,7 @@ Scenario — Fund Transfer Flow
 Without Facade
 ----------------
 	Your controller must call all services manually:
-
+	-----------------------------------------------
 	accountService.debit(fromAccount, amount);
 	accountService.credit(toAccount, amount);
 	ledgerService.recordTransaction(...);
@@ -1999,6 +2178,10 @@ Bridge design pattern
 
 	Key principle: Favor composition over inheritance.
 
+The Core Intent of Bridge Pattern
+------------------------------------
+“Decouple abstraction from implementation so that both can vary independently.”
+
 Real-Life Analogy
 -----------------------
 Imagine a Remote Control and TV:
@@ -2032,7 +2215,7 @@ Adding a new TV or Remote causes class explosion.
 
 	
 Bridge Pattern solves this!
-
+---------------------------------
        Bridge Pattern Structure
 
        Abstraction         →        Implementation
@@ -2129,6 +2312,94 @@ public class BridgePatternDemo {
     }
 }
 
+The Core Intent of Bridge Pattern
+----------------------------------
+“Decouple abstraction from implementation so that both can vary independently.”
+
+That means:
+---------
+	You can add new abstractions (Remote types) 
+	without touching the TV implementations, and
+	
+	You can add new implementations (TV types) 
+	without touching the Remote abstraction.
+	
+	So, the Bridge pattern’s goal is:
+	----------------------------------
+	To eliminate tight coupling (inheritance-based dependency) 
+	and replace it with flexible composition.
+
+
+Add a new Implementation — PhilipsTV
+-------------------------------------
+class PhilipsTV implements TV {
+    public void on() { System.out.println("Philips TV turned ON"); }
+    public void off() { System.out.println("Philips TV turned OFF"); }
+    public void setChannel(int channel) {
+        System.out.println("Philips TV: channel set to " + channel);
+    }
+}
+
+
+No change in RemoteControl, BasicRemote, or AdvancedRemote!
+---------------------------------------------------
+Now we can do:
+----------------
+RemoteControl remote = new BasicRemote(new PhilipsTV());
+remote.turnOn();
+remote.setChannel(7);
+Works perfectly — abstraction untouched.
+
+Add a new Abstraction — VoiceRemote
+-------------------------------------------
+class VoiceRemote extends RemoteControl {
+    public VoiceRemote(TV tv) { super(tv); }
+
+    public void setChannel(int channel) {
+        System.out.println("Voice command: change channel");
+        tv.setChannel(channel);
+    }
+
+    public void voiceCommand(String cmd) {
+        System.out.println("Executing command: " + cmd);
+    }
+}
+
+
+No change in SonyTV, LGTV, or PhilipsTV!
+-------------------------------------------
+Now:
+
+RemoteControl remote = new VoiceRemote(new LGTV());
+remote.turnOn();
+remote.setChannel(15);
+
+
+Works again — implementation untouched.
+
+Inheritance vs Composition (Why Bridge Exists)
+------------------------------------------
+If you had used inheritance:
+AdvancedRemoteForSony extends SonyTV
+You’d get rigid coupling: you can’t reuse the remote with another TV.
+By using composition:
+protected TV tv;
+
+
+the RemoteControl delegates behavior to any TV object, not to a parent class.
+This is the famous “Favor composition over inheritance” principle.
+
+🧩 Visual Recap (ASCII)
+        +-----------------+           +-------------------+
+        |  RemoteControl  |◄----------|      TV (interface)|
+        +-----------------+           +-------------------+
+                 ▲                               ▲
+                 │                               │
+       +-----------------+            +------------------+
+       |  BasicRemote    |            |   SonyTV         |
+       +-----------------+            +------------------+
+       |  AdvancedRemote |            |   LGTV           |
+       +-----------------+            +------------------+
 
 Key Benefits of Bridge Pattern
 --------------------------------
@@ -2229,10 +2500,318 @@ public class CompositeDemo {
     }
 }
 
+Structural Design Patterns — The Common Thread
+------------------------------------------------
+	Structural patterns are all about how classes and objects are
+	composed to form larger, flexible structures.
+
+	Most (actually, all) structural design patterns use composition (object references) 
+	rather than inheritance to achieve synergy between multiple collaborating objects.
+
+	They aim to:
+	------------
+	Combine existing components without modifying them,
+	Promote reusability and flexibility,
+	Build larger abstractions out of smaller parts.
+
+🧠 Why Composition = “Synergic Effect”
+----------------------------------------
+	Synergy = The whole is greater than the sum of its parts.
+
+	Composition lets multiple small objects (each doing one thing well) work together 
+	dynamically to produce complex behavior — without creating rigid hierarchies.
+
+	Inheritance = static and rigid
+	Composition = dynamic and flexible
+
+	Structural patterns achieve this synergy by delegation, 
+	wrapping, or linking objects together.
+
+Structural Patterns Overview (and How Each Uses Composition)
+----------------------------------------------------------
+Pattern			Core Idea				How Composition is Used	Synergic 	Effect
+Adapter		Convert one interface		Holds a reference to the adaptee	Makes incompatible objects 
+					into another											work together
+			 
+Bridge		Decouple abstraction 		Abstraction holds a reference		Both can evolve independently
+			from implementation			 to implementation interface
+			
+Composite	Treat individual and 		Contains a list of children 		Recursive structure enables
+			group of objects uniformly			components					tree-like hierarchies	
+			
+Decorator	Add behavior dynamically 	Wraps another object 				Stackable, runtime behavior addition
+			to an object				of same interface	
+				
+Facade		Simplify complex subsystem	Aggregates multiple 				Unified, simplified access layer
+										subsystem objects	
+										
+Flyweight	Reuse objects efficiently	Shares intrinsic state 				Reduces memory while maintaining behavior
+										via shared references
+										
+Proxy		Control access to		Maintains reference to real object	Adds control (lazy loading, security, caching, etc.)
+			 another object
+
+
+	
+So structurally:
+------------------
+Client → Wrapper/Bridge/Proxy/Facade → Real Object(s)
+All achieve synergy by combining objects that each play a defined role.
+
+Composition vs Inheritance (Structural DPs Philosophy)
+----------------------------------------------------
+Aspect				Inheritance			Composition
+Type				"is-a"					"has-a"
+Binding				Compile-time			Run-time
+Flexibility			Low						High
+Reuse				Reuses code				Reuses behavior
+Structural DPs use?	❌ Rarely				✅ Always
+
+That’s why structural patterns represent the “architecture of relationships” 
+between objects — not new algorithms, but new ways to connect existing classes.
+
+Big Picture Summary
+------------------------
+Principle								Structural Pattern Manifestation
+Favor composition over inheritance			Universal across all patterns
+Reuse existing code without modification	Adapter, Proxy, Facade
+Combine multiple objects dynamically		Composite, Decorator
+Decouple subsystems							Bridge, Facade
+Optimize structure							Flyweight
+
+In Plain English
+------------------------
+All structural design patterns are composers —
+They don’t create new “notes” (classes),
+they orchestrate existing ones into beautiful, flexible “music” (systems).
+
+
+
 
 ======================
  Behavioral Patterns
 ======================
+
+	Behavioral Design Patterns focus on how objects interact and communicate 
+	with each other to achieve loose coupling and flexible behavior.
+
+	Now let’s take that understanding and build a solid mental model of 
+	what “behavioral” really means 👇
+
+	1. Core Intent of Behavioral Design Patterns
+	--------------------------------------------
+	Structural patterns → define how classes/objects are composed
+	Behavioral patterns → define how they communicate and collaborate
+
+	The key goal is:
+	---------------------
+	To separate “what to do” from “who does it” and “how it’s done.”
+
+	They let you design systems where:
+	------------------------------------
+	Objects talk to each other without hard dependencies
+	You can change behavior dynamically at runtime
+	New behaviors can be added without modifying existing code
+
+	2. Why They Exist
+	--------------------
+
+	Imagine a system where:
+	Each object knows too much about others,
+	Behavior is hardcoded (e.g., if (x instanceof Y) checks),
+	Changing logic breaks everything.
+
+	That’s tight coupling — the enemy of scalability.
+
+	Behavioral patterns fix that by:
+	-----------------------------------
+	Defining clear contracts for communication,
+	Delegating responsibility smartly,
+
+	Promoting “Tell, don’t ask” and “Open/Closed principle” design.
+
+ 3. The Behavioral Design Patterns Family
+------------------------------------------------
+	Let’s explore all 11 classic GoF behavioral patterns briefly 
+	— with purpose and “communication style.”
+
+Pattern					Purpose							Type of Communication
+------------------------------------------------------------------------------
+Strategy		Define interchangeable					Object delegates a task to a strategy object
+				 algorithms
+				 
+Command			Encapsulate a request as an object		Invoker asks a Command to execute
+
+Observer		Notify multiple objects automatically	Subject broadcasts updates to observers
+
+Mediator		Centralize complex communications		Mediator routes messages between colleagues
+
+Chain of 		Pass requests along a chain	Each handler decides to handle or pass on
+Responsibility
+
+Template 	   Define skeleton of an algorithm		Base class defines flow; subclass customizes steps
+Method
+
+State		Change behavior when internal 			Context delegates to different state objects
+			state changes	
+			
+Visitor		Add new operations 						Visitor “visits” different object types
+			without modifying classes	
+			
+Interpreter	Define grammar and 						Each rule is an object; composition builds meaning
+			interpret expressions
+			
+Iterator	Sequentially access elements			Iterator object controls traversal logic
+
+Memento		Capture and restore object state		Caretaker stores/restores snapshots
+
+
+4. Common Design Thread
+-------------------
+
+All Behavioral DPs:
+
+	Use composition and delegation (not inheritance)
+	Focus on collaboration and role-based behavior
+	Encourage low coupling, high cohesion
+	Make systems open for extension, closed for modification
+
+5. Examples and Intuition
+-------------------------
+
+Strategy Pattern
+-----------------
+Lets you choose an algorithm dynamically.
+
+interface PaymentStrategy {
+    void pay(int amount);
+}
+
+class CreditCardPayment implements PaymentStrategy {
+    public void pay(int amount) {
+        System.out.println("Paid using credit card: " + amount);
+    }
+}
+
+class PayPalPayment implements PaymentStrategy {
+    public void pay(int amount) {
+        System.out.println("Paid using PayPal: " + amount);
+    }
+}
+
+class ShoppingCart {
+    private PaymentStrategy strategy;
+    public void setStrategy(PaymentStrategy strategy) { this.strategy = strategy; }
+    public void checkout(int amount) { strategy.pay(amount); }
+}
+
+
+The ShoppingCart doesn’t know how payment happens — it just delegates it.
+Loose coupling achieved!
+
+
+Observer Pattern
+-------------------
+A one-to-many relationship where subjects notify observers automatically.
+
+interface Observer {
+    void update(String message);
+}
+
+class NewsChannel implements Observer {
+    public void update(String message) {
+        System.out.println("News received: " + message);
+    }
+}
+
+class NewsAgency {
+    private List<Observer> observers = new ArrayList<>();
+    void addObserver(Observer o) { observers.add(o); }
+    void setNews(String news) {
+        for (Observer o : observers) o.update(news);
+    }
+}
+
+
+The NewsAgency doesn’t care who listens — it just notifies all observers.
+
+Command Pattern
+------------------
+Turns a request into an object, decoupling sender and receiver.
+
+interface Command { void execute(); }
+
+class Light {
+    void on() { System.out.println("Light ON"); }
+    void off() { System.out.println("Light OFF"); }
+}
+
+class TurnOnCommand implements Command {
+    private Light light;
+    TurnOnCommand(Light light) { this.light = light; }
+    public void execute() { light.on(); }
+}
+
+class RemoteControl {
+    private Command command;
+    void setCommand(Command c) { command = c; }
+    void pressButton() { command.execute(); }
+}
+
+
+The RemoteControl has no idea about Light — it just runs a Command.
+
+6. Common Benefits Across Behavioral DPs
+------------------------------------------
+Benefit						Description
+---------------------------------------------
+Loose coupling		Participants know interfaces, not implementations
+
+Flexibility			You can change communication logic dynamically
+
+Extensibility		Add new behaviors without touching existing code
+
+Better separation 	Each class focuses on a single role
+of concerns	
+Increased reusability	Reuse behaviors and coordination logic
+
+
+7. Behavioral vs Structural in One Line
+----------------------------------------------------
+Aspect			Structural				Behavioral
+Focus			Object composition		Object collaboration
+Concern			“How things are built”	“How things talk”
+Examples		Adapter, Bridge, Proxy	Strategy, Observer, Command
+Achieves		Reusability, flexibility Communication, decoupling
+Design Principle Favor composition		Favor delegation
+
+8. Real-World Spring Boot Analogy
+-------------------------------------------
+Let’s connect this to Spring Boot, where behavioral patterns are everywhere:
+
+Pattern				Example in Spring
+-----------------------------------
+Strategy			JpaRepository using different DataAccessStrategy
+Observer			ApplicationEvent / ApplicationListener
+Command	@Controller methods mapped to requests
+Template Method		JdbcTemplate, RestTemplate
+Chain of 			Servlet filters / Spring Security filter chain
+Responsibility
+
+State			Spring State Machine library
+Iterator		BeanFactory iterating over beans
+
+Spring heavily uses these patterns to keep things loosely coupled and highly pluggable.
+
+In Simple Terms
+------------------
+Structural patterns build the architecture of your house.
+
+Behavioral patterns define how people inside communicate 
+— who talks to whom, who takes responsibility, and how to change behavior without rebuilding the house.
+
+Let now discuss all behavior pattern one by one:
+----------------------------------------------
 		Iterator
 		Observer
 		Strategy

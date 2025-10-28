@@ -1,1 +1,8 @@
 1761448334807	Rename package 'com.bankapp.repo'
+1761629413826	Rename type 'Account'
+1761629521579	Rename type 'AccountDto'
+1761636345055	Delete element
+1761636350271	Delete element
+1761636458574	Rename type 'AccountDaoCollectionImpl'
+1761636589027	Copy compilation unit
+1761638010426	Rename type 'HelloController'

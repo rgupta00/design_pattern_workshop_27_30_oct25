@@ -1,0 +1,43 @@
+package com.oops.ex0;
+
+//
+/*
+ * "A passanger named raj is using metro to travel from BTM to Banargatta"
+ * 
+ * what is abstraction?
+	design principle of seprating interface from implementation 
+	so that client only concern with interface
+	
+	iplementated by interface / abs class
+	we just need to press ac remote 
+ */
+//3 ways : use a , has a(Compostion and agg) , is a (inheritance)
+//favour Compostion over inheritance*
+
+class Metro{
+	public void move(String s, String d) {
+		System.out.println("passanger is moving from "+ s + " to "+ d +" using metro");
+	}
+}
+class Passanger {
+	private String name;
+
+	public Passanger(String name) {
+		this.name = name;
+	}
+	
+	public void travel(String s, String d, Metro m) {
+		System.out.println("passnger named : "+ name);
+		m.move(s, d);
+	}
+	
+}
+public class DemoLoseCoupling {
+
+	public static void main(String[] args) {
+		Metro metro=new Metro();
+		Passanger passanger=new Passanger("raj");
+		passanger.travel("BTM", "Banargatta", metro);
+		
+	}
+}

@@ -1,6 +1,7 @@
 package com.dp.creational.b.clonning;
 
 import java.util.Date;
+
 /*
  * @Override
 	public Object clone() throws CloneNotSupportedException {
@@ -10,26 +11,32 @@ import java.util.Date;
 		
 	}
  */
-class Employee{
+class Employee implements Cloneable {
 	private Integer id;
 	private String name;
-	private Date hireDay;//mutable
+	private Date hireDay;// mutable
+
+	@Override
+	protected Object clone() throws CloneNotSupportedException {
+		Employee e=(Employee) super.clone();//do shallow copy
+		e.hireDay=(Date) hireDay.clone();	
+		return e;
+	}
 
 	public Employee(Integer id, String name, Date date) {
 		super();
 		this.id = id;
 		this.name = name;
-		this.hireDay=date;
+		this.hireDay = date;
 	}
 
 	@Override
 	public String toString() {
-		return "Employee [id=" + id + ", name=" + name + ", hireDay=" + hireDay
-				+ "]";
+		return "Employee [id=" + id + ", name=" + name + ", hireDay=" + hireDay + "]";
 	}
 
-	public void changeHireDay(int year, int month, int day){
-		 hireDay.setDate(day);
+	public void changeHireDay(int year, int month, int day) {
+		hireDay.setDate(day);
 	}
 
 	public Integer getId() {
@@ -56,10 +63,3 @@ class Employee{
 		this.hireDay = hireDay;
 	}
 }
-
-
-
-
-
-
-

@@ -9,7 +9,10 @@ public class DemoBuilderDP {
 		//it polute string pool?
 		
 		
-		String b=new StringBuffer().append("foo").append("bar").append("jar").append("car").toString();
+		String b=new StringBuilder()
+				.append("foo")
+				.append("bar")
+				.append("jar").append("car").toString();
 		
 		
 		

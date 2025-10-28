@@ -1,0 +1,18 @@
+package com.oops.ex2;
+/*
+ * design principle of seprating interface from implementation 
+	so that client only concern with interface
+ */
+public class Main {
+
+	public static void main(String[] args) {
+		StackImpRaj impRaj=new StackImpRaj(10);
+		impRaj.pushRaj(2);
+		impRaj.pushRaj(32);
+		
+		System.out.println(impRaj.popRaj());
+		System.out.println(impRaj.popRaj());
+		
+		
+	}
+}
