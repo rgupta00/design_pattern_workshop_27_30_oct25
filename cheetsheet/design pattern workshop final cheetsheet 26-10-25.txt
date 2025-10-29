@@ -49,6 +49,7 @@ Deep Dive design pattern with java
 Design patterns: OOPs, SOLID, DP, framework
 
 what is abstraction?
+-------------------
 	design principle of seprating interface from implementation 
 	so that client only concern with interface
 	
@@ -56,6 +57,7 @@ what is abstraction?
 	we just need to press ac remote 
 
 encapsulation
+-------------
 	process of restructing access to inner implemtation details 
 	of the class
 	internel not exposed to the outside world
@@ -66,12 +68,14 @@ encapsulation
 	ability to refactor / change internel code without breaking outer code
 
 inteface:
+---------
 	specification of an behiavioiur 
 	interface represent some feature of class
 	what and object can do 
 	standarization of an behaviour
 	
 abs class
+--------
 	generalization of an behaviour 
 	incomplete class that require further speficication
 	
@@ -138,8 +142,8 @@ When to go for interface, when to go for abstract class?
 => interface break the hierarchy
 -------------------------------------------------
 
-		Rotate
-		|
+					Rotate
+						|
          ----------------------------
          |                			|
 		Top							Tyre
@@ -243,6 +247,114 @@ public class Demo {
 
 //3 ways : use a , has a(Compostion and agg) , is a (inheritance)
 
+There are primarily three forms of object interaction
+-------------------------------------------------
+In my understanding, Object-Oriented Programming (OOP) is fundamentally the study of how objects 
+interact with each other. 
+
+There are primarily three forms of object interaction
+	— ‘uses-a’ (dependency),
+	‘has-a’ (composition or aggregation),
+	and ‘is-a’ (inheritance). 
+	
+	
+1. A passanger named raj moving in metro from Preet vihar to Laxmi nagar
+2. A  building has a flat
+3. Comapany has many employees
+4. Current account is aka account
+
+
+Understanding OOP as “Interaction Between Objects”
+---------------------------------------------------
+At its core, Object-Oriented Programming (OOP) is not just about creating classes and objects —
+it’s about how objects interact with each other to model real-world systems.
+
+Every object has:
+-----------------------
+State (data) — represented by fields or attributes
+Behavior (actions) — represented by methods
+Identity — uniqueness among other objects
+
+But the true power of OOP comes from how objects collaborate —
+Mainly three types of interactions between objects 
+
+1. “Uses-a” Relationship (Dependency)
+---------------------------------------------
+One object uses another temporarily to perform a task.
+
+Example:
+-----------
+public class PaymentService {
+    public void processPayment() {
+        EmailService emailService = new EmailService(); // uses-a
+        emailService.sendEmail("Payment successful");
+    }
+}
+
+Here, PaymentService uses EmailService but doesn’t store it permanently.
+This is the loosest form of coupling — ideal for dependency injection in frameworks like Spring Boot.
+
+
+ 2. “Has-a” Relationship (Composition or Aggregation)
+---------------------------------------------------
+One object contains another object as part of its state.
+
+This is a stronger connection than “uses-a”.
+
+Composition (Strong Has-a)
+-----------------------------
+Lifetime of contained object depends on the container.
+
+Example:
+------------
+public class Car {
+    private Engine engine = new Engine(); // Composition
+
+    public void start() {
+        engine.run();
+    }
+}
+
+If Car is destroyed, Engine also ceases to exist.
+It’s a part-of relationship — tightly coupled.
+
+Aggregation (Weak Has-a)
+------------------------
+Lifetime of contained object is independent.
+
+Example:
+------------
+public class Department {
+    private List<Employee> employees; // Aggregation
+}
+
+
+Here, Employee can exist even without the Department.
+This is a loose has-a relationship.
+
+ Spring Boot Angle:
+ ----------------
+In a domain model, Order → List<Item> often follows this “has-a” pattern
+where the lifecycle may or may not be dependent — based on cascade configuration in JPA.
+
+3. “Is-a” Relationship (Inheritance)
+---------------------------------
+One object is a specialized form of another.
+
+Example:
+----------------
+public class Account {}
+public class SavingsAccount extends Account {} // is-a
+
+This relationship models hierarchy and polymorphism.
+
+Spring Boot Angle:
+-------------------
+When you define common functionality in a base service class and extend it in child services
+(e.g., BaseService, CustomerService, OrderService),
+you’re leveraging “is-a” for code reuse and specialization.
+	
+	
 Passanger Metro
 
 
@@ -274,17 +386,10 @@ class Passanger {
 	
 }
 
-
+God class example: violation of SRP
+----------------------------
 package com.demo;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.Properties;
 
 //GOD class--- 
 class Product {
@@ -883,6 +988,33 @@ Creational Pattern
 	So the question is: Do we need to mark singletonObject as volatile to
 	 ensure thread-safety in the double-checked locking pattern?
 
+
+
+
+
+
+ enum ShirtShize{
+	S, M , L ,XL;
+}
+
+
+enum ShirtShize{
+	public static final ShirtShize S=new ShirtShize();
+	public static final ShirtShize M=new ShirtShize();
+	public static final ShirtShize L=new ShirtShize();
+	public static final ShirtShize XL=new ShirtShize();
+	
+	
+}
+enum Singleton{
+	INSTANCE;
+};
+
+
+rest controller---------- service --------------- repo/dao ---------db
+
+
+
 	Prototype Pattern (best practics for creating clone)
 	===================================================
 
@@ -1130,22 +1262,17 @@ Why this is better
 	=> createSocket() of java.rmi.server.RmiClientSocketFactory
 
 
-
+How to create jdbc connection factory: simple factory
+-------------------------------------------
 db.properties
--------------------
-
+-------------
 driver=com.mysql.jdbc.Driver
 url=jdbc:mysql://localhost:3306/bookapp
 user=root
 password=root
 
-
-
-
 Create an connection factory
 -------------------------
-
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -1189,8 +1316,10 @@ public class ConnectionFactory{
     }
 }
 
+
+
 Factory Method pattern
-	========================
+========================
 	=> Defind an interface for creating an object, but let subclass decide which object to instantiate, 
 		Factory method let a class defer instantiation to subclass using inheritance.
 
@@ -1414,6 +1543,9 @@ Factory Method pattern
 
 
 
+
+
+
 Example 2: Simple factory vs factory method design pattern vs Abstract Factory Pattern
 ----------------------------------------------------------------------------------
 
@@ -1422,8 +1554,10 @@ Simple Factory Pattern
 A Simple Factory creates objects for you — you just tell it what type you want.
 
 In simple words:
-You give it a name or type, and it gives you the right object.
-You don’t worry about new keyword or which class to create.
+----------------
+	You give it a name or type, and it gives you the right object.
+	You don’t worry about new keyword or which class to create.
+
 
 Factory Method Pattern
 ----------------------
@@ -1431,6 +1565,7 @@ A Factory Method lets subclasses decide which object to create.
 The parent defines a method, but child classes implement the actual creation logic.
 
 In simple words:
+---------------
 Each subclass has its own factory logic.
 The parent says, “I need a product,” and the child decides which one exactly.
 
@@ -1674,9 +1809,41 @@ public class AbstractFactoryDemo {
     }
 
 
-
 structural patterns 
-==========================
+=========================
+	Structural Design Patterns
+		Structural patterns deal with object composition — 
+		how objects and classes are combined to form larger, flexible structures.
+
+		Why called “Structural”?
+			Because they focus on the structure of classes and objects 
+			— how to connect or wrap them without changing their code.
+
+	==> Structural Patterns describe how objects and 
+		classes can be combined to form larger structures
+
+	==> class patterns vs object patterns
+
+	==> The difference between class patterns and object patterns is that 
+		class patterns describe abstraction with the help of inheritance
+		and how it can be used to provide more useful program interface. 
+
+	==> Object patterns, on other hand, describe how objects can
+		 be associated and composed to form larger, more complex structures
+
+Structural Design Patterns:
+
+	Adapter		 → converts one interface to another
+	Decorator    → adds features dynamically
+	Facade 		 → simplified interface to complex systems
+	Bridge		 → separates abstraction from implementation
+	Composite	 → tree-like structure (e.g., branches and leaves)
+	Proxy 		 → controls access to another object
+	Flyweight 	→ reuses shared objects efficiently
+	
+	
+structural patterns 
+==================
 		=> Adapter
 		=> Decorator
 		=> Facade Pattern
@@ -1942,9 +2109,7 @@ Example RMI:
 
 RMI server
 -------------
-
 public interface AtmCard extends Remote {
-
 	public boolean isValid(String card)throws RemoteException;
 }
 
@@ -2027,9 +2192,8 @@ Scenario — Fund Transfer Flow
 Without Facade
 ----------------
 	Your controller must call all services manually:
-	-----------------------------------------------
-	accountService.debit(fromAccount, amount);
-	accountService.credit(toAccount, amount);
+	--------------------------------------------
+	accountService.transfer(....);
 	ledgerService.recordTransaction(...);
 	fraudService.validate(...);
 	notificationService.sendSMS(...);
@@ -2052,19 +2216,15 @@ Subsystems — Complex Services
 AccountService.java
 -----------------------
 public class AccountService {
-    public void debit(String accountId, double amount) {
-        System.out.println("Debiting " + amount + " from account " + accountId);
-    }
-
-    public void credit(String accountId, double amount) {
-        System.out.println("Crediting " + amount + " to account " + accountId);
-    }
+   public void transfer(int from, int to, double amount){
+   
+	}
 }
 
 LedgerService.java
 -----------------------
 public class LedgerService {
-    public void record(String from, String to, double amount) {
+    public void record(int from, int to, double amount) {
         System.out.println("Ledger updated: Transfer of " + amount + " from " + from + " to " + to);
     }
 }
@@ -2072,7 +2232,7 @@ public class LedgerService {
 FraudService.java
 -----------------------
 public class FraudService {
-    public boolean validate(String from, String to, double amount) {
+    public boolean validate(int from, int to, double amount) {
         System.out.println("Validating fraud for " + amount + " transfer...");
         return amount < 100000; // simple rule
     }
@@ -2091,6 +2251,10 @@ The Facade Class
 FundTransferFacade.java
 -----------------------
 public class FundTransferFacade {
+public void transferFunds(String fromAcc, String toAcc, double amount);
+}
+
+public class FundTransferFacadeImpl {
 
     private final AccountService accountService;
     private final LedgerService ledgerService;
@@ -2229,7 +2393,7 @@ Bridge Pattern solves this!
 Bridge Pattern Example
 
 Step 1: Implementation Layer (TVs)
----------------------
+-------------------------------
 interface TV {
     void on();
     void off();
@@ -2591,7 +2755,6 @@ they orchestrate existing ones into beautiful, flexible “music” (systems).
 ======================
  Behavioral Patterns
 ======================
-
 	Behavioral Design Patterns focus on how objects interact and communicate 
 	with each other to achieve loose coupling and flexible behavior.
 
@@ -2652,6 +2815,10 @@ Responsibility
 Template 	   Define skeleton of an algorithm		Base class defines flow; subclass customizes steps
 Method
 
+Iterator	Sequentially access elements			Iterator object controls traversal logic
+
+Memento		Capture and restore object state		Caretaker stores/restores snapshots
+
 State		Change behavior when internal 			Context delegates to different state objects
 			state changes	
 			
@@ -2661,16 +2828,14 @@ Visitor		Add new operations 						Visitor “visits” different object types
 Interpreter	Define grammar and 						Each rule is an object; composition builds meaning
 			interpret expressions
 			
-Iterator	Sequentially access elements			Iterator object controls traversal logic
 
-Memento		Capture and restore object state		Caretaker stores/restores snapshots
 
 
 4. Common Design Thread
 -------------------
 
 All Behavioral DPs:
-
+-----------------
 	Use composition and delegation (not inheritance)
 	Focus on collaboration and role-based behavior
 	Encourage low coupling, high cohesion
@@ -2784,6 +2949,83 @@ Concern			“How things are built”	“How things talk”
 Examples		Adapter, Bridge, Proxy	Strategy, Observer, Command
 Achieves		Reusability, flexibility Communication, decoupling
 Design Principle Favor composition		Favor delegation
+
+
+
+Why so many behavior design patterns?
+------------------------------------
+	most of the GoF (Gang of Four) design patterns fall under the Behavioral category.
+
+
+
+1. Quick Recap — What Are Behavioral Patterns
+-----------------------------------------------
+	Behavioral design patterns are concerned with how objects interact 
+	and communicate with each other.
+
+	They don’t focus on structure (how classes are composed) like Structural patterns,
+	 nor on object creation (how objects are instantiated) like Creational patterns.
+
+	Instead, they focus on object collaboration, responsibility distribution, and communication logic
+	 — which is the heart of any software’s behavior.
+
+2. Typical Object-Oriented System
+---------------------------------
+	In any large OO system:
+	Objects are already created (so Creational patterns are done).
+	Classes are already organized (so Structural patterns are stable).
+	
+	The real complexity is in how these objects interact dynamically at runtime — this is behavioral territory.
+
+That’s where we face questions like:
+-------------------------------------
+	Who should handle this request?
+	How can we notify other components when one changes?
+	How can we execute a sequence of operations flexibly?
+	How can we change algorithms without touching the clients?
+	All these are behavioral problems.
+
+3. Why So Many Behavioral Patterns?
+-------------------------------------
+Let’s look at what kind of “behaviors” developers need to control or abstract — you’ll see why GoF had to define so many:
+
+Concern	Example						 	Pattern					Description
+-----------------------------------------------------------------------------
+Communication between objects			Observer				Notify dependent objects of changes
+Encapsulating a request or operation	Command					Turn a request into an object
+Choosing an algorithm at runtime		Strategy				Swap algorithms dynamically
+Avoiding tight coupling between			Mediator				Centralize communication
+ sender and receiver
+ 
+Iterating through collections			Iterator				Traverse elements without exposing structure
+
+Building responsibility chains			Chain of Responsibility	Pass a request along a chain until handled
+
+Representing grammar					Interpreter				Define a grammar and evaluate sentences
+and language rules	
+
+Capturing and restoring state			Memento					Undo or rollback capability
+
+Representing operations as objects		Visitor					Separate operations from the objects they operate on
+
+State-dependent behavior				State					Change behavior when internal state changes
+
+Coordinating complex 					Template 				Method	Define skeleton of algorithm,
+operations														 let subclasses fill steps
+
+ Each one deals with a different style of interaction or control flow — hence so many behavioral patterns.
+
+4. Analogy — Software as a Play 🎭
+--------------------------------------
+	Think of your software as a theater play:
+
+	Creational patterns = how actors are hired and set up before the show.
+	Structural patterns = how the stage and props are arranged.
+	Behavioral patterns = how the actors interact and deliver the story.
+
+	Since the story (behavior) is the main essence of the play, it naturally needs more
+	 types of coordination patterns — that’s why behavioral patterns are the majority.
+
 
 8. Real-World Spring Boot Analogy
 -------------------------------------------
@@ -3104,7 +3346,8 @@ Strategy Pattern
 
 
 
-Strategy Pattern: Designing shopping cart :
+
+Example2: Strategy Pattern: Designing shopping cart :
 ------------------------
 
 class Product {
@@ -3383,6 +3626,11 @@ Template Method Pattern
 
 
 
+
+
+
+
+
 Example 2:
 -----------
 
@@ -3463,6 +3711,8 @@ public class GlassHouse extends HouseTemplate {
 	=> All non-abstract methods of java.io.InputStream, java.io.OutputStream, java.io.Reader and java.io.Writer.
 
 	=> All non-abstract methods of java.util.AbstractList, java.util.AbstractSet and java.util.AbstractMap.
+
+
 
 
 
