@@ -6,3 +6,8 @@
 1761636458574	Rename type 'AccountDaoCollectionImpl'
 1761636589027	Copy compilation unit
 1761638010426	Rename type 'HelloController'
+1761721753744	Delete elements
+1761721774067	Rename type 'Account'
+1761722137014	Copy compilation unit
+1761722146600	Rename type 'AccountDto'
+1761722196385	Rename package 'com.bankapp.dao'

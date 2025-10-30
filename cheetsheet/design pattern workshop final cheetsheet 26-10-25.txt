@@ -2694,6 +2694,7 @@ Structural Design Patterns — The Common Thread
 Structural Patterns Overview (and How Each Uses Composition)
 ----------------------------------------------------------
 Pattern			Core Idea				How Composition is Used	Synergic 	Effect
+-------------------------------------------------------------------------------
 Adapter		Convert one interface		Holds a reference to the adaptee	Makes incompatible objects 
 					into another											work together
 			 
@@ -2764,6 +2765,7 @@ they orchestrate existing ones into beautiful, flexible “music” (systems).
 	1. Core Intent of Behavioral Design Patterns
 	--------------------------------------------
 	Structural patterns → define how classes/objects are composed
+	
 	Behavioral patterns → define how they communicate and collaborate
 
 	The key goal is:
@@ -2800,14 +2802,12 @@ they orchestrate existing ones into beautiful, flexible “music” (systems).
 
 Pattern					Purpose							Type of Communication
 ------------------------------------------------------------------------------
+Iterator	Sequentially access elements			Iterator object controls traversal logic
+
 Strategy		Define interchangeable					Object delegates a task to a strategy object
 				 algorithms
 				 
-Command			Encapsulate a request as an object		Invoker asks a Command to execute
-
 Observer		Notify multiple objects automatically	Subject broadcasts updates to observers
-
-Mediator		Centralize complex communications		Mediator routes messages between colleagues
 
 Chain of 		Pass requests along a chain	Each handler decides to handle or pass on
 Responsibility
@@ -2815,7 +2815,9 @@ Responsibility
 Template 	   Define skeleton of an algorithm		Base class defines flow; subclass customizes steps
 Method
 
-Iterator	Sequentially access elements			Iterator object controls traversal logic
+Command			Encapsulate a request as an object		Invoker asks a Command to execute
+
+Mediator		Centralize complex communications		Mediator routes messages between colleagues
 
 Memento		Capture and restore object state		Caretaker stores/restores snapshots
 
@@ -2833,7 +2835,6 @@ Interpreter	Define grammar and 						Each rule is an object; composition builds 
 
 4. Common Design Thread
 -------------------
-
 All Behavioral DPs:
 -----------------
 	Use composition and delegation (not inheritance)
@@ -2843,11 +2844,10 @@ All Behavioral DPs:
 
 5. Examples and Intuition
 -------------------------
-
 Strategy Pattern
 -----------------
 Lets you choose an algorithm dynamically.
-
+------------------------------------
 interface PaymentStrategy {
     void pay(int amount);
 }
@@ -3034,13 +3034,14 @@ Let’s connect this to Spring Boot, where behavioral patterns are everywhere:
 Pattern				Example in Spring
 -----------------------------------
 Strategy			JpaRepository using different DataAccessStrategy
+
 Observer			ApplicationEvent / ApplicationListener
-Command	@Controller methods mapped to requests
+
 Template Method		JdbcTemplate, RestTemplate
+
 Chain of 			Servlet filters / Spring Security filter chain
 Responsibility
 
-State			Spring State Machine library
 Iterator		BeanFactory iterating over beans
 
 Spring heavily uses these patterns to keep things loosely coupled and highly pluggable.
@@ -3052,7 +3053,7 @@ Structural patterns build the architecture of your house.
 Behavioral patterns define how people inside communicate 
 — who talks to whom, who takes responsibility, and how to change behavior without rebuilding the house.
 
-Let now discuss all behavior pattern one by one:
+Let now discuss behavior pattern one by one:
 ----------------------------------------------
 		Iterator
 		Observer
@@ -3186,13 +3187,18 @@ Observer design pattern:
 		It defines a one-to-many dependency between objects so that when one object changes state, 
 		all its dependents are notified automatically.
 
-	
+
+YT 
+Obserable ----- Observer 
+news paper			you
+wala
+
 
 Observer design pattern
 ----------------------
+
 Attempt 1
 -----------
-
 	class NewsAgency extends Observable {
 		private String news;
 		public void setNews(String news) {
@@ -3235,17 +3241,18 @@ Attempt 1
 Attempt 2: Custom Observer Pattern in Java (Best Practice)
 --------------------------------------------------------
 
-	Subject (Observable)
+	//Subject (Observable)
 	interface Subject {
 		void addObserver(Observer o);
 		void removeObserver(Observer o);
 		void notifyObservers(String message);
 	}
-	Observer (Subscriber)
+	//Observer (Subscriber)
 	interface Observer {
 		void update(String message);
 	}
-	Concrete Subject
+	
+	//Concrete Subject
 	class NewsAgency implements Subject {
 		private List<Observer> observers = new ArrayList<>();
 
@@ -3268,15 +3275,18 @@ Attempt 2: Custom Observer Pattern in Java (Best Practice)
 			notifyObservers(news);
 		}
 	}
-	Concrete Observers
+	
+	//Concrete Observers
 	class EmailSubscriber implements Observer {
 		public void update(String message) {
 			System.out.println("Email received: " + message);
 		}
 	}
+	
 	class SMSSubscriber implements Observer {}
 
 	Demo
+	----------
 	NewsAgency agency = new NewsAgency();
 	Observer email = new EmailSubscriber();
 	Observer sms = new SMSSubscriber();
@@ -3296,6 +3306,20 @@ Strategy Pattern
 	as an object, and make them interchangeable select algo at run time convert IS-A to HAS-A
 
 
+	Definition (GoF):
+	“Define a family of algorithms, encapsulate each one, and make them interchangeable. 
+	The Strategy Pattern lets the algorithm vary independently from clients that use it.”
+
+	So in plain English:
+	---------------------
+		You have multiple implementations (strategies) of an interface.
+		The client can choose which one to use at runtime.
+		The context delegates behavior to the selected strategy.
+
+	Spring and Strategy pattern:
+	---------------------------
+	Spring’s dependency injection and @Primary mechanism reflect the Strategy pattern principle.
+	“Spring allows you to swap implementations at runtime or configuration time — which is Strategy Pattern behavior.”
 
 	Strategy Interface
 	-----------------
@@ -3346,8 +3370,79 @@ Strategy Pattern
 
 
 
+Light weight strategy design pattern( with java 8 and lambda)
+-------------------------------------------------------------
+class Apple {
+	private String color;
+	private int weight;
 
-Example2: Strategy Pattern: Designing shopping cart :
+	public String getColor() {
+		return color;
+	}
+
+	public void setColor(String color) {
+		this.color = color;
+	}
+
+	public int getWeight() {
+		return weight;
+	}
+
+	public void setWeight(int weight) {
+		this.weight = weight;
+	}
+
+	public Apple(String color, int weight) {
+		this.color = color;
+		this.weight = weight;
+	}
+
+	public Apple() {
+	}
+
+	@Override
+	public String toString() {
+		return "Apple [color=" + color + ", weight=" + weight + "]";
+	}
+
+}
+
+class Inventrory {
+
+	public static List<Apple> getGreenApple(List<Apple> apples) {
+		List<Apple> geenApples = new ArrayList<Apple>();
+		for (Apple temp : apples) {
+			if (temp.getColor().equalsIgnoreCase("green"))
+				geenApples.add(temp);
+		}
+		return geenApples;
+	}
+
+}
+
+public class DemoBehaviouralParameterization {
+
+	public static void main(String[] args) {
+		List<Apple> apples = createApples();
+		
+	}
+
+	public static List<Apple> createApples() {
+		List<Apple> apples = new ArrayList<>();
+		Random random = new Random();
+
+		for (int i = 0; i < 10; i++) {
+			String color = random.nextBoolean() ? "red" : "green";
+			int weight = 200 + random.nextInt(201); // 200–400 inclusive
+			apples.add(new Apple(color, weight));
+		}
+
+		return apples;
+	}
+}
+
+
+Example2: Strategy Pattern: Designing shopping cart with varying discount policies
 ------------------------
 
 class Product {
@@ -3484,8 +3579,6 @@ Chain of Responsibility
 	=> Ex: ATM Dispense machine, 50$, 20$, 10$ etc
 
 
-
-
 The Chain of Responsibility (CoR) design pattern
 ----------------------------------------------
 	 allows a request to pass through a 
@@ -3526,12 +3619,24 @@ The Chain of Responsibility (CoR) design pattern
 		}
 	}
 
-
 	class AgentSupport extends SupportHandler {
-		//"MEDIUM"
+		public void handleRequest(String level, String message) {
+			if (level.equalsIgnoreCase("MEDIUM")) {
+				System.out.println("AgentSupport handled: " + message);
+			} else {
+				super.handleRequest(level, message);
+			}
+		}
 	}
-	class ManagerSupport extends SupportHandler {
-	   //"HIGH" 
+	
+		class ManagerSupport extends SupportHandler {
+		public void handleRequest(String level, String message) {
+			if (level.equalsIgnoreCase("HIGH")) {
+				System.out.println("Bot handled: " + message);
+			} else {
+				super.handleRequest(level, message);
+			}
+		}
 	}
 
 	3. Client Code
@@ -3553,6 +3658,8 @@ template design pattern:
 Template Method defines the skeleton of an algorithm in a superclass but lets
  subclasses override specific steps without changing the algorithm’s structure.
  
+ It defines what to do and when to do it in the base class, 
+ but lets subclasses decide how to do it.
  
 	=> Template Method is a behavioral design pattern. 
 
@@ -3573,6 +3680,17 @@ Template Method defines the skeleton of an algorithm in a superclass but lets
 	=> So in this case we can create a template method that will use different methods to build the house
 
 
+Why Template Method is Behavioral
+----------------------------------------
+	Because it controls the behavior (flow) of an algorithm by:
+	Defining a fixed sequence of operations (the behavior flow).
+	Delegating specific steps (behaviors) to subclasses.
+	Allowing different variations in behavior without changing the algorithm structure.
+
+In other words:
+---------------
+	The Template Method pattern focuses on how different parts of 
+	an algorithm behave and collaborate, rather than how objects are composed or created.
 
  
 Template Method Pattern
@@ -3718,17 +3836,72 @@ public class GlassHouse extends HouseTemplate {
 
 
 command design pattern:(Behavioral)
-=======================================
+====================================
+
 	=> command design pattern is used to implement loose coupling in a request-response model
+	
 	=> In command pattern, the request is send to the invoker and invoker
 		 pass it to the encapsulated command object.
-	=> Command object passes the request to the appropriate method of Receiver to perform the specific action.
+		 
+	=> Command object passes the request to the appropriate 
+	method of Receiver to perform the specific action.
+
+Intent:
+--------
+	Encapsulate a request as an object, allowing you to parameterize 
+	clients with different requests, queue or log requests, and support undoable operations.
+
+	Instead of invoking a method directly, the Command pattern wraps a request
+	(method call + receiver + parameters) inside a Command object.
+
+	This means that a request becomes data, which can be:
+		Passed around,
+		Queued,
+		Executed later,
+		Logged, or even undone.
+
+
+class HelloServlet extends HttpServlet{
+
+	public void doPost(........., .............){
+		String data="code";
+		req.setAttribute("code",code)
+		RequestDispacher rd=req1.getrequestdispacher("foo.jsp");
+		rd.forward(req, resp);
+		
+	
+	}
+}
+then we recived it into jsp?
+
+code can be simplified with the command pattern while using spring mvc with jsp?
+
+
+Why It’s a Behavioral Pattern
+-----------------------------
+	Because the Command pattern focuses on behavior delegation and request handling,
+	not object structure or creation.
+
+It deals with:
+--------------
+	How objects interact (Invoker, Command, Receiver)
+	How actions (behaviors) are encapsulated and triggered
+	How a request is executed, delayed, or logged
+	
+	It’s not about:
+	------------------
+	Creating objects (that’s creational)
+	Composing objects (that’s structural)
+	Instead, it’s about controlling how actions (behaviors) are issued and executed.
+
+👉 So it falls into the Behavioral category — it’s all about behavior orchestration.
 
 
 Smart Home Command Example 
 ----------------------------
 	To wrap a task (a request) inside an object.
 	It means we keep “what needs to be done” and “who will do it” separate from each other.
+
 
 1. Command Interface
 ------------------------
@@ -3789,10 +3962,69 @@ public class RemoteControl {
  remote.pressButton(); // Light OFF
 
 
+4. How It’s Used in Spring MVC
+----------------------------------
+	Spring MVC heavily follows a Command pattern–like approach in how
+	it handles HTTP requests as command objects.
+
+Let’s see it practically.
+------------------------
+a) Command Object in Spring MVC
+----------------------------
+When you write:
+---------------
+@PostMapping("/register")
+public String registerUser(@ModelAttribute("user") User user) {
+    userService.save(user);
+    return "success";
+}
+
+Here:
+-------
+	User acts as a Command Object.
+	Spring binds HTTP request parameters to this object automatically.
+	The controller method acts like a Receiver.
+	The Spring DispatcherServlet acts like the Invoker.
+
+So the flow is:
+-------------
+	Browser (Client)
+	   ↓
+	DispatcherServlet (Invoker)
+	   ↓
+	HandlerMapping → Controller (Receiver)
+	   ↓
+	@ModelAttribute object (Command)
+
+	This decouples the request from the execution logic, 
+	following the Command pattern’s behavioral intent.
+
+b) DispatcherServlet as Invoker
+--------------------------------
+	DispatcherServlet in Spring MVC is a front controller that:
+
+	Receives all HTTP requests.
+
+	Identifies which Controller and Command Object should handle it.
+
+	Invokes the appropriate handler method.
+
+	You can think of it as:
+
+	Command = encapsulated HTTP request
+	Receiver = controller
+	Invoker = DispatcherServlet
+	Client = web browser
+
+
+	Each HTTP request is effectively turned into a command execution flow.
 
 
 memento design pattern
 =======================
+Memento captures and externalizes an object’s internal state 
+so it can be restored later, without violating encapsulation.
+
 Memento Design Pattern — Simple Definition:
 	It saves an object’s state at a moment in time so you can restore it later — 
 	like an undo button — without exposing the object’s internal details.
@@ -3807,6 +4039,11 @@ Memento Design Pattern — Simple Definition:
 	=> Example text editors where we can save it’s data anytime and 
 	use undo to restore it to previous saved state
 
+	Imagine a game where Ekta reaches Level 5 and saves her game.
+	Later she fails in Level 6, so she "loads the save point" — this is Memento in action:
+		• Save = createMemento()
+		• Load = restoreFromMemento(memento)
+	
 Game Save Example
 -----------------
 1. Memento: stores state
@@ -3870,12 +4107,44 @@ public class GameCaretaker {
         caretaker.undo(game); // back to Level 1
 
 
+Where is Memento used?
+---------------------
+
+	Domain				Use Case Example
+	---------------------------------------
+	Text Editors		Undo/Redo of text changes
+	IDEs				Save points during debugging or refactoring
+	Games				Save game checkpoints
+	Forms/Wizards		Restore previous screen state
+	Data Entry			Revert partially-filled forms
 
 
+Serializable / Externalizable
+---------------------------
+	Serialization can be used to persist object state to disk and reload 
+	— a real-world memento mechanism.
 
+	ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	ObjectOutputStream oos = new ObjectOutputStream(baos);
+	oos.writeObject(object);  // save
 
+	ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray()));
+	MyObject restored = (MyObject) ois.readObject(); // restore
 
+Entity Versioning with Hibernate Envers
+-------------------------------------
+    • Tracks entity revisions.
+    • Rollback to any previous version.
+    • Transparent snapshot mechanism.
 
+	@Entity
+	@Audited // Hibernate Envers annotation
+	public class UserProfile {
+		private String name;
+		private String email;
+	}
+	
+	
 Mediator design pattern
 ---------------------------
 	“Don’t let many objects talk to each other directly.
@@ -3957,7 +4226,6 @@ ekta.send("Hi! How are you?");
 
 Interpreter Design Pattern
 ==========================
-
 	=> Interpreter pattern is one of the behavioral design pattern and 
 	is used to defines a grammatical representation for a language and provides 
 	an interpreter to deal with this grammar. 
@@ -3965,7 +4233,250 @@ Interpreter Design Pattern
 	The best example of this pattern is java compiler that interprets the java 
 	source code into byte code that is understandable by JVM. Google Translator
 
+	1. What Is the Interpreter Design Pattern?
+	-------------------------------------------
+	The Interpreter Pattern defines a way to evaluate language grammar or expressions
+	by representing rules as a class hierarchy.
 
+	In simple terms:
+	It allows you to interpret and evaluate sentences in a custom language or rule syntax, 
+	by modeling grammar rules as objects.
+
+Example Analogy
+----------------------
+	Think of how a calculator interprets 5 + 3 * 2.
+	Each number and operator (+, *) is part of a language grammar.
+
+	An interpreter pattern allows you to:
+		Represent each part (Expression) as an object.
+		Build a tree (Expression Tree).
+		Evaluate it by calling .interpret().
+
+2. Core Participants
+---------------------
+	Component				Role
+	------------------------------
+	AbstractExpression		Declares the interpret() interface
+	TerminalExpression		Represents constants/variables
+	NonTerminalExpression	Represents operators or rules combining expressions
+	Context	Contains global information needed during interpretation
+
+Example (Simplified Expression Evaluator)
+---------------------------------------
+	interface Expression {
+		int interpret();
+	}
+
+	// Terminal Expression
+	class NumberExpression implements Expression {
+		private int number;
+		public NumberExpression(int number) { this.number = number; }
+		public int interpret() { return number; }
+	}
+
+	// Non-Terminal Expression (Addition)
+	class AddExpression implements Expression {
+		private Expression left, right;
+		public AddExpression(Expression left, Expression right) {
+			this.left = left;
+			this.right = right;
+		}
+		public int interpret() {
+			return left.interpret() + right.interpret();
+		}
+	}
+
+	// Client
+	public class InterpreterDemo {
+		public static void main(String[] args) {
+			// Represents (5 + 3) + (2 + 1)
+			Expression result = new AddExpression(
+					new AddExpression(new NumberExpression(5), new NumberExpression(3)),
+					new AddExpression(new NumberExpression(2), new NumberExpression(1))
+			);
+
+			System.out.println("Result: " + result.interpret());
+		}
+	}
+
+3. Why It’s a Behavioral Pattern
+-----------------------------------
+	Because it focuses on how objects collaborate to interpret and execute meaning (behavior)
+	of sentences in a language.
+
+	It’s not about structure or creation, but about interpreting 
+	behavior defined by rules — hence behavioral.
+
+4. Real Power — Rule-Based Frameworks
+------------------------------------
+	Now let’s connect it to Spring Boot and real-world use.
+
+	A rule engine evaluates conditions dynamically, for example:
+
+	IF (customer.age > 60 AND customer.accountBalance > 50000)
+	THEN discount = 10%
+
+
+You could:
+----------------
+	Write Java if-else blocks everywhere 😬
+	OR build a rule interpreter that can evaluate dynamic rule expressions at runtime ✅
+
+	That’s the Interpreter Pattern in action.
+
+5. Interpreter Pattern in a Rule Engine (Spring Boot Example)
+---------------------------------------------
+	We’ll build a simple rule interpreter that evaluates 
+	logical expressions defined as text.
+
+Step 1: Define the Expression Interface
+--------------------------------
+public interface Expression {
+    boolean interpret(Context context);
+}
+
+Step 2: Define Context (stores runtime data)
+------------------------------------------------
+public class Context {
+    private Map<String, Object> data = new HashMap<>();
+
+    public void put(String key, Object value) {
+        data.put(key, value);
+    }
+
+    public Object get(String key) {
+        return data.get(key);
+    }
+}
+
+Step 3: Implement Terminal and Non-Terminal Expressions
+---------------------------------------------------------
+// Terminal Expression
+public class VariableExpression implements Expression {
+    private String key;
+    private String operator;
+    private Object value;
+
+    public VariableExpression(String key, String operator, Object value) {
+        this.key = key;
+        this.operator = operator;
+        this.value = value;
+    }
+
+    @Override
+    public boolean interpret(Context context) {
+        Object obj = context.get(key);
+        if (obj instanceof Integer) {
+            int var = (Integer) obj;
+            int val = Integer.parseInt(value.toString());
+            return switch (operator) {
+                case ">" -> var > val;
+                case "<" -> var < val;
+                case "==" -> var == val;
+                default -> false;
+            };
+        }
+        return false;
+    }
+}
+
+// Non-terminal Expression for logical AND
+----------------------------------------------
+public class AndExpression implements Expression {
+    private Expression left, right;
+    public AndExpression(Expression left, Expression right) {
+        this.left = left;
+        this.right = right;
+    }
+    @Override
+    public boolean interpret(Context context) {
+        return left.interpret(context) && right.interpret(context);
+    }
+}
+
+// Non-terminal Expression for logical OR
+-------------------------------------------------
+public class OrExpression implements Expression {
+    private Expression left, right;
+    public OrExpression(Expression left, Expression right) {
+        this.left = left;
+        this.right = right;
+    }
+    @Override
+    public boolean interpret(Context context) {
+        return left.interpret(context) || right.interpret(context);
+    }
+}
+
+Step 4: Test in a Spring Boot Runner
+----------------------------------
+@SpringBootApplication
+public class RuleInterpreterApp implements CommandLineRunner {
+
+    public static void main(String[] args) {
+        SpringApplication.run(RuleInterpreterApp.class, args);
+    }
+
+    @Override
+    public void run(String... args) {
+        Context ctx = new Context();
+        ctx.put("age", 65);
+        ctx.put("balance", 70000);
+
+        Expression ageRule = new VariableExpression("age", ">", 60);
+        Expression balanceRule = new VariableExpression("balance", ">", 50000);
+        Expression rule = new AndExpression(ageRule, balanceRule);
+
+        boolean eligible = rule.interpret(ctx);
+        System.out.println("Eligible for discount: " + eligible);
+    }
+}
+
+
+Output:
+---------
+Eligible for discount: true
+
+7. Spring Expression Language (SpEL) — Built-in Interpreter
+-------------------------------------------------------------
+Spring already implements the Interpreter pattern internally via SpEL.
+
+Example:
+---------
+	ExpressionParser parser = new SpelExpressionParser();
+	Expression exp = parser.parseExpression("age > 60 and balance > 50000");
+
+	StandardEvaluationContext ctx = new StandardEvaluationContext();
+	ctx.setVariable("age", 65);
+	ctx.setVariable("balance", 70000);
+
+	boolean result = exp.getValue(ctx, Boolean.class);
+	System.out.println("Eligible: " + result);
+
+	Same idea — interpret expression at runtime → Interpreter pattern.
+
+8. Real Use Cases in Enterprise Apps
+-------------------------------------
+Use Case							Interpreter Role
+Rule Engines (Drools, SpEL)			Evaluate business rules dynamically
+Workflow Engines					Interpret workflow DSL (e.g., BPMN)
+Search Query Builders				Parse query strings like (name=John AND age>30)
+Custom Validation Engines			Define dynamic validation logic
+Feature Toggles	Interpret 			runtime conditions for feature activation
+
+9. Key Takeaways
+-------------------
+Interpreter pattern = turning rules/expressions into executable objects.
+It’s behavioral because it controls how expressions behave at runtime.
+
+In Spring Boot, it’s fundamental for:
+	SpEL
+	Rule-based services
+	Workflow or Policy engines
+	It’s the foundation behind “configurable intelligence” in enterprise systems.
+
+State Pattern
+=============
 
 
 
