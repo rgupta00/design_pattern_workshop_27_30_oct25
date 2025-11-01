@@ -102,9 +102,204 @@ class Cat {
 	Date dob;	
 }
 
+Two Meanings of Abstraction in Java
+-------------------------------------------
+	In Java, “abstraction” is used in two related senses:
 
-Understanding Abstraction:
-----------------------
+Type										Meaning	Example
+Data Abstraction (at class design level)	Hiding irrelevant details and showing only necessary data 
+											(i.e., choosing relevant instance variables and methods for the client).	
+											 CatForDoctor vs CatForOwner example 
+											
+Method Abstraction (at implementation level)	Hiding how something is done and only exposing 
+												what can be done (via abstract classes or interfaces).	
+													Using abstract classes or interface
+
+2. Data Abstraction — via Class Design
+-------------------------------------
+ data abstraction perfectly:
+
+class CatForDoctor {
+    private String regId;
+    private String diseaseHistory;
+    private double consultancyFee;
+}
+
+class CatForOwner {
+    private String name;
+    private String favouriteFood;
+}
+
+
+	Each class hides unnecessary information and shows 
+	only what’s needed for that specific user (doctor or cat lover).
+
+	That’s data abstraction — achieved just by thoughtful class design and encapsulation.
+
+Method Abstraction — via abstract and interface
+--------------------------------------------
+	To achieve method-level abstraction, we use abstract classes or interfaces.
+	These define what must be done, not how it is done.
+
+	Example 1 — Using abstract class
+	-------------------------
+	abstract class Animal {
+		abstract void makeSound();  // no implementation → abstraction
+		void sleep() {
+			System.out.println("Sleeping...");
+		}
+	}
+
+	class Cat extends Animal {
+		@Override
+		void makeSound() {
+			System.out.println("Meow Meow");
+		}
+	}
+
+
+	Here:
+	---------
+	makeSound() is abstract → defines what an animal should do.
+	Subclass (Cat) provides the how (the actual sound).
+
+
+	Example 2 — Using interface
+	-------------------------
+	interface Pet {
+		void play();   // abstract method by default
+	}
+
+	class Cat implements Pet {
+		@Override
+		public void play() {
+			System.out.println("Cat plays with yarn!");
+		}
+	}
+
+
+	The interface says “Any pet can play”, but doesn’t say how —
+	Each class (Cat, Dog, etc.) decides its own implementation.
+
+Summary Table
+-------------
+Type				Achieved By	Example
+Data Abstraction	Class design and encapsulation	
+					Choosing only relevant data for user 
+					(e.g., CatForDoctor, CatForOwner)
+					
+Method Abstraction	abstract class or interface	Declaring 
+					methods without implementation (makeSound(), play())
+
+Final Takeaway
+--------------
+	Data Abstraction hides data details (what info to show).
+	Method Abstraction hides implementation details (how behavior works).
+
+	Both together form the core of abstraction in Java.
+
+Understanding Data Abstraction:
+---------------------------------
+	"If I want to design a Cat class for a doctor, 
+	I’ll keep medical info (like diseaseHistory, numberOfBonesFractured),
+	
+	and if I want to design it for a lady who loves cats, I’ll keep personal 
+	traits (like name, favouriteFood)."
+
+
+that’s data abstraction in action.
+-------------------------------
+
+What is Data Abstraction?
+----------------------------
+Data abstraction means:
+	Showing only relevant information to the user and hiding unnecessary details.
+
+In OOP terms:
+	You expose only those properties and behaviors (methods) 
+	that are relevant for a particular context or user.
+
+You hide or ignore the rest.
+-------------------------
+
+Example Explained
+---------------------
+You might have two different abstraction views of the same real-world object (Cat):
+
+🩺 For a Veterinary Doctor
+class CatForDoctor {
+    private String regId;
+    private String ownerName;
+    private int numberOfBonesFractured;
+    private String diseaseHistory;
+    private double consultancyFee;
+}
+
+	Focus is on medical and professional data.
+	Doctor doesn’t care about the cat’s favorite toy or food.
+
+💕 For a Pet Lover / Cat Owner
+class CatForOwner {
+    private String name;
+    private String favouriteFood;
+    private Date dob;
+    private String breed;
+    private boolean vaccinated;
+}
+
+Focus is on emotional and personal aspects of the pet.
+The lady doesn’t care about clinical data like consultancyFee.
+
+4. Both Are Abstractions of the Same Real Entity
+--------------------------------------------
+	Both classes represent a Cat, but with different levels and views of abstraction:
+	One is medical abstraction (for a doctor)
+	Another is emotional abstraction (for a cat lover)
+
+5. Deeper OO Insight
+------------------------
+You could also represent this using inheritance and abstraction:
+
+abstract class Cat {
+    private String name;
+    private Date dob;
+}
+
+class MedicalCat extends Cat {
+    private String regId;
+    private String diseaseHistory;
+}
+
+class PetCat extends Cat {
+    private String favouriteFood;
+    private String ownerName;
+}
+
+
+Cat → abstract base representing common attributes
+MedicalCat and PetCat → specialized abstractions based on user perspective
+
+Conclusion
+----------
+Concept						Meaning in your example
+Abstraction					Representing the cat differently for doctor 
+							vs. pet lover by exposing only relevant data.
+							
+Encapsulation				Keeping data private (e.g., using private variables)
+							and exposing via getters/setters.
+							
+Polymorphism				If both have common behavior like makeSound()
+							but different implementations.
+							
+Inheritance						Sharing base attributes like name, 
+								dob in a parent Cat class.
+
+Designing different versions of the Cat class with different instance variables based on the client’s perspective 
+is a perfect example of data abstraction.
+
+Refer detail discussion on abstraction:
+
+
 
 Need of Method abst:
 ---------------------
@@ -763,7 +958,7 @@ structural patterns
 		 be associated and composed to form larger, more complex structures
 
 Structural Design Patterns:
-
+-------------------------------
 	Adapter		 → converts one interface to another
 	Bridge		 → separates abstraction from implementation
 	Composite	 → tree-like structure (e.g., branches and leaves)
@@ -777,7 +972,6 @@ Structural Design Patterns:
 
 Behavioral Patterns
 ------------------
-
 Behavioral Design Patterns
 	Behavioral patterns deal with object interaction 
 	— how objects communicate and share responsibilities.
@@ -798,6 +992,7 @@ Behavioral Design Patterns
 		coupled in order to avoid hard-coding and dependencies.
 
 	==> Behavioral Patterns
+	-------------------------
 	Strategy 		→ interchangeable algorithms (e.g., UPI vs NEFT)
 	Observer 		→ notifies listeners (e.g., SMS/email alerts)
 	State			 → behavior changes with state (e.g., Account Active/Blocked)
@@ -809,7 +1004,7 @@ Behavioral Design Patterns
 
 
 java reflection and annotation programing?
-
+https://www.youtube.com/watch?v=uyAj7fSGdNQ&list=PLv2-IhRmhbySgIQo3rH8KnclTSOYAp2xG&index=8
 
 
 
@@ -1015,8 +1210,8 @@ rest controller---------- service --------------- repo/dao ---------db
 
 
 
-	Prototype Pattern (best practics for creating clone)
-	===================================================
+Prototype Pattern (best practics for creating clone)
+===================================================
 
 		=> About creating clone of an object
 
@@ -1527,7 +1722,7 @@ Factory Method pattern
 		closeFile();
 
 	}
-	 abstract Parser createParser(File file);
+	 abstract Parser createParser(String file);
 
 
 		=> now its works as a framework for batch processing
@@ -1809,8 +2004,12 @@ public class AbstractFactoryDemo {
     }
 
 
+
+
+
 structural patterns 
-=========================
+====================
+
 	Structural Design Patterns
 		Structural patterns deal with object composition — 
 		how objects and classes are combined to form larger, flexible structures.
@@ -1832,7 +2031,7 @@ structural patterns
 		 be associated and composed to form larger, more complex structures
 
 Structural Design Patterns:
-
+----------------------------
 	Adapter		 → converts one interface to another
 	Decorator    → adds features dynamically
 	Facade 		 → simplified interface to complex systems
@@ -2042,6 +2241,7 @@ Cross-Cutting Concerns?
 	— not part of business logic but required everywhere.
 
 	Examples:
+	---------
 		Logging
 		Security checks
 		Transaction management
@@ -2580,7 +2780,6 @@ Key Benefits of Bridge Pattern
 
 Composite Design Pattern
 -------------------------
-
   What is Composite Design Pattern?
 	Composite Pattern is used when we want to treat a group of
 	objects and individual objects uniformly.
@@ -2780,7 +2979,6 @@ they orchestrate existing ones into beautiful, flexible “music” (systems).
 
 	2. Why They Exist
 	--------------------
-
 	Imagine a system where:
 	Each object knows too much about others,
 	Behavior is hardcoded (e.g., if (x instanceof Y) checks),
@@ -2944,6 +3142,7 @@ Increased reusability	Reuse behaviors and coordination logic
 7. Behavioral vs Structural in One Line
 ----------------------------------------------------
 Aspect			Structural				Behavioral
+----------------------------------------------------
 Focus			Object composition		Object collaboration
 Concern			“How things are built”	“How things talk”
 Examples		Adapter, Bridge, Proxy	Strategy, Observer, Command
@@ -2987,13 +3186,17 @@ That’s where we face questions like:
 
 3. Why So Many Behavioral Patterns?
 -------------------------------------
-Let’s look at what kind of “behaviors” developers need to control or abstract — you’ll see why GoF had to define so many:
+Let’s look at what kind of “behaviors” developers need to control or abstract
+ — you’ll see why GoF had to define so many:
 
 Concern	Example						 	Pattern					Description
 -----------------------------------------------------------------------------
 Communication between objects			Observer				Notify dependent objects of changes
+
 Encapsulating a request or operation	Command					Turn a request into an object
+
 Choosing an algorithm at runtime		Strategy				Swap algorithms dynamically
+
 Avoiding tight coupling between			Mediator				Centralize communication
  sender and receiver
  
@@ -3832,7 +4035,7 @@ public class GlassHouse extends HouseTemplate {
 
 
 
-
+Spring boot : spring jdbcTemplate example
 
 
 command design pattern:(Behavioral)
@@ -4474,9 +4677,483 @@ In Spring Boot, it’s fundamental for:
 	Rule-based services
 	Workflow or Policy engines
 	It’s the foundation behind “configurable intelligence” in enterprise systems.
+	
+	
 
 State Pattern
 =============
+What is State Pattern?
+	State Pattern allows an object to alter its behavior when its internal state changes.
+	It appears as if the object changed its class.
+	
+    • Avoids large if-else or switch statements.
+    • Each state is encapsulated in a separate class.
+	
+ State Scenario: ATM machine.
+ Behavior changes based on state: hasCard, noCard, hasPin, outOfCash. in depth java code , 
+ jdk internel example spring boot
+
+Real-life Scenario: ATM Machine
+---------------------------------------
+An ATM behaves differently based on its state:
+State			Behavior
+NoCard			Only accepts a card
+HasCard			Allows PIN entry
+HasPin			Allows withdrawal
+NoCashState		Displays "Out of service"
+
+We’ll model this using the State Pattern.
+
+Java Implementation of ATM using State Pattern
+-----------------------------------------------
+
+1. ATMState Interface (State)
+---------------------------
+public interface ATMState {
+    void insertCard();
+    void ejectCard();
+    void enterPin(int pin);
+    void withdrawCash(int amount);
+}
+
+2. Concrete States
+----------------------
+                  
+NoCardState
+---------
+public class NoCardState implements ATMState {
+    private final ATMMachine atm;
+
+    public NoCardState(ATMMachine atm) {
+        this.atm = atm;
+    }
+
+    public void insertCard() {
+        System.out.println("Card inserted.");
+        atm.setState(atm.getHasCardState());
+    }
+
+    public void ejectCard() {
+        System.out.println("No card to eject.");
+    }
+
+    public void enterPin(int pin) {
+        System.out.println("Insert card first.");
+    }
+
+    public void withdrawCash(int amount) {
+        System.out.println("Insert card first.");
+    }
+}
+
+HasCardState
+------------
+public class HasCardState implements ATMState {
+    private final ATMMachine atm;
+
+    public HasCardState(ATMMachine atm) {
+        this.atm = atm;
+    }
+
+    public void insertCard() {
+        System.out.println("Card already inserted.");
+    }
+
+    public void ejectCard() {
+        System.out.println("Card ejected.");
+        atm.setState(atm.getNoCardState());
+    }
+
+    public void enterPin(int pin) {
+        if (pin == 1234) {
+            System.out.println("Correct PIN.");
+            atm.setState(atm.getHasPinState());
+        } else {
+            System.out.println("Incorrect PIN.");
+        }
+    }
+
+    public void withdrawCash(int amount) {
+        System.out.println("Enter PIN first.");
+    }
+}
+
+HasPinState
+-----------
+public class HasPinState implements ATMState {
+    private final ATMMachine atm;
+
+    public HasPinState(ATMMachine atm) {
+        this.atm = atm;
+    }
+
+    public void insertCard() {
+        System.out.println("Card already inserted.");
+    }
+
+    public void ejectCard() {
+        System.out.println("Card ejected.");
+        atm.setState(atm.getNoCardState());
+    }
+
+    public void enterPin(int pin) {
+        System.out.println("PIN already entered.");
+    }
+
+    public void withdrawCash(int amount) {
+        if (atm.getCashInMachine() >= amount) {
+            System.out.println("Dispensed ₹" + amount);
+            atm.setCashInMachine(atm.getCashInMachine() - amount);
+            if (atm.getCashInMachine() <= 0) {
+                System.out.println("Machine is now out of cash.");
+                atm.setState(atm.getNoCashState());
+            }
+        } else {
+            System.out.println("Not enough cash.");
+        }
+    }
+}
+
+NoCashState
+-----------
+public class NoCashState implements ATMState {
+    public NoCashState(ATMMachine atm) {}
+
+    public void insertCard() {
+        System.out.println("No cash. Cannot accept card.");
+    }
+
+    public void ejectCard() {
+        System.out.println("No card inserted.");
+    }
+
+    public void enterPin(int pin) {
+        System.out.println("No cash. Cannot process PIN.");
+    }
+
+    public void withdrawCash(int amount) {
+        System.out.println("No cash available.");
+    }
+}
+
+3. ATMMachine (Context)
+-------------------------
+public class ATMMachine {
+    private final ATMState noCard;
+    private final ATMState hasCard;
+    private final ATMState hasPin;
+    private final ATMState noCash;
+
+    private ATMState currentState;
+    private int cashInMachine;
+
+    public ATMMachine(int initialCash) {
+        this.noCard = new NoCardState(this);
+        this.hasCard = new HasCardState(this);
+        this.hasPin = new HasPinState(this);
+        this.noCash = new NoCashState(this);
+
+        this.cashInMachine = initialCash;
+        this.currentState = initialCash > 0 ? noCard : noCash;
+    }
+
+    // Delegate to current state
+    public void insertCard() { currentState.insertCard(); }
+    public void ejectCard() { currentState.ejectCard(); }
+    public void enterPin(int pin) { currentState.enterPin(pin); }
+    public void withdrawCash(int amount) { currentState.withdrawCash(amount); }
+
+    // State and cash management
+    public void setState(ATMState state) { this.currentState = state; }
+    public void setCashInMachine(int cash) { this.cashInMachine = cash; }
+
+    public ATMState getNoCardState() { return noCard; }
+    public ATMState getHasCardState() { return hasCard; }
+    public ATMState getHasPinState() { return hasPin; }
+    public ATMState getNoCashState() { return noCash; }
+
+    public int getCashInMachine() { return cashInMachine; }
+}
+
+4. Client Code
+-----------------
+public class ATMClient {
+    public static void main(String[] args) {
+        ATMMachine atm = new ATMMachine(5000);
+
+        atm.insertCard();
+        atm.enterPin(1234);
+        atm.withdrawCash(2000);
+
+        atm.withdrawCash(3000);
+        atm.insertCard(); // Should show "No cash..."
+    }
+}
+
+ Output
+-----------
+Card inserted.
+Correct PIN.
+Dispensed ₹2000
+Dispensed ₹3000
+Machine is now out of cash.
+No cash. Cannot accept card.
+
+Spring Boot Use Case: State Pattern
+---------------------------------------
+Spring Boot doesn’t use State directly, but it fits in:
+1. Workflow Engines (e.g., Camunda, Activiti)
+    • Each state in a process (Submitted, Approved, Rejected) can be implemented using State pattern.
+    • Spring Boot can inject the correct State object based on the current status.
+
+2. Order Management System (OMS)
+---------------------------------
+Example:
+public interface OrderState {
+    void proceed(OrderContext context);
+}
+States: NewOrderState, PackedState, ShippedState, DeliveredState
+Spring can:
+    • Autowire these states.
+    • Keep state in DB.
+    • Inject dynamically using a map or strategy.
+
+ 3. Spring State Machine Project
+Spring Statemachine: A framework built specifically to implement workflows and state-driven behavior.
+
+     
+What is the State Pattern?
+----------------------------------
+State pattern allows an object to change its behavior when its internal state changes.
+It appears as if the object changed its class.
+
+Real-World Scenario: Order Lifecycle in OMS
+--------------------------------------
+States:
+    • NewOrderState → Order placed
+    • PackedState → Order packed
+    • ShippedState → Shipped to customer
+    • DeliveredState → Delivered
+	
+Each state controls what can or cannot happen next.
+
+Plain Java Implementation
+------------------------------
+
+Step 1: Define OrderState interface
+----------------------------------
+public interface OrderState {
+    void proceed(OrderContext context);
+    String getStatus();
+}
+
+Step 2: Implement each state
+---------------------------------
+New Order
+--------
+public class NewOrderState implements OrderState {
+    public void proceed(OrderContext context) {
+        System.out.println("Order packed.");
+        context.setState(new PackedState());
+    }
+    public String getStatus() {
+        return "New Order";
+    }
+}
+
+Packed
+--------
+public class PackedState implements OrderState {
+    public void proceed(OrderContext context) {
+        System.out.println("Order shipped.");
+        context.setState(new ShippedState());
+    }
+    public String getStatus() {
+        return "Packed";
+    }
+}
+ 
+Shipped
+---------
+public class ShippedState implements OrderState {
+    public void proceed(OrderContext context) {
+        System.out.println("Order delivered.");
+        context.setState(new DeliveredState());
+    }
+    public String getStatus() {
+        return "Shipped";
+    }
+}
+
+Delivered
+--------------
+public class DeliveredState implements OrderState {
+    public void proceed(OrderContext context) {
+        System.out.println("Order already delivered.");
+    }
+    public String getStatus() {
+        return "Delivered";
+    }
+}
+
+Step 3: OrderContext (State Manager)
+----------------------------------
+public class OrderContext {
+    private OrderState state;
+
+    public OrderContext() {
+        this.state = new NewOrderState(); // default
+    }
+
+    public void setState(OrderState state) {
+        this.state = state;
+    }
+
+    public void proceed() {
+        state.proceed(this);
+    }
+
+    public String getStatus() {
+        return state.getStatus();
+    }
+}
+
+Step 4: Client
+------------------
+public class OMSClient {
+    public static void main(String[] args) {
+        OrderContext order = new OrderContext();
+
+        System.out.println("Status: " + order.getStatus());
+        order.proceed();
+
+        System.out.println("Status: " + order.getStatus());
+        order.proceed();
+
+        System.out.println("Status: " + order.getStatus());
+        order.proceed();
+
+        System.out.println("Status: " + order.getStatus());
+        order.proceed();
+    }
+}
+
+Output
+---------
+Status: New Order
+Order packed.
+Status: Packed
+Order shipped.
+Status: Shipped
+Order delivered.
+Status: Delivered
+Order already delivered.
+
+Spring Boot Version (Dynamic Autowiring)
+--------------------------------------
+Let’s assume:
+    • States are Spring Beans.
+    • State transitions stored in DB.
+    • Spring injects the right state dynamically using @Qualifier or a map.
+
+1. Define State Beans
+--------------------
+@Component("new")
+public class NewOrderState implements OrderState {
+    public void proceed(OrderContext context) {
+        context.setState(context.getStateByKey("packed"));
+    }
+    public String getStatus() { return "New"; }
+}
+
+@Component("packed")
+public class PackedState implements OrderState {
+    public void proceed(OrderContext context) {
+        context.setState(context.getStateByKey("shipped"));
+    }
+    public String getStatus() { return "Packed"; }
+}
+
+2. OrderContext with Map<String, OrderState>
+------------------------------------------
+@Component
+public class OrderContext {
+    private OrderState currentState;
+
+    @Autowired
+    private Map<String, OrderState> stateMap;  // Inject all @Component states
+
+    @PostConstruct
+    public void init() {
+        this.currentState = stateMap.get("new");  // Initial state
+    }
+
+    public void setState(OrderState state) {
+        this.currentState = state;
+    }
+
+    public void proceed() {
+        currentState.proceed(this);
+    }
+
+    public String getStatus() {
+        return currentState.getStatus();
+    }
+
+    public OrderState getStateByKey(String key) {
+        return stateMap.get(key);
+    }
+}
+
+Persistence of State
+-----------------------
+In a real app, you can save the order state in DB:
+
+@Entity
+public class Order {
+    @Id
+    private Long id;
+
+    private String state;  // "new", "packed", etc.
+}
+During retrieval:
+
+Order order = orderRepo.findById(1L);
+orderContext.setState(stateMap.get(order.getState()));
+
+JDK Internal Example
+-----------------------
+
+Thread.State enum is a good example
+Java threads go through these states: NEW, RUNNABLE, WAITING, TIMED_WAITING, BLOCKED, TERMINATED.
+Each state defines what behavior is valid — this follows the state pattern.
+
+           ✅ Where to Apply in Spring Boot
+Use Case
+Role of State Pattern
+Order Processing
+Change behavior as order progresses
+Workflow Engines (Camunda, Flowable)
+Each stage is a state
+Subscription Management
+Free → Trial → Paid → Suspended states
+Approval Flows
+Draft → Submitted → Approved → Rejected
+
+           🔚 Summary
+Concept
+Detail
+Intent
+Vary behavior of an object based on internal state
+JDK Example
+Thread.State
+Spring Boot Use
+Use Spring beans to model states, inject dynamically
+Persistence
+Store state key in DB and hydrate using Spring beans
+Benefit
+Cleaner transitions, no long if-else chains
+
 
 
 
